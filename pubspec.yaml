@@ -1,0 +1,70 @@
+name: voice_levels_app
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.8
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # Animation
+  lottie: ^3.1.2
+
+  # Permissions
+  permission_handler: ^11.3.1
+
+  # Audio recording
+  record: ^6.2.0
+
+  # Audio level detection (decibel)
+  noise_meter: ^5.0.2
+
+  # Audio playback
+  audioplayers: ^6.1.0
+
+  # Local storage
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
+  # Paths / files
+  path_provider: ^2.1.4
+
+  # Utils
+  uuid: ^4.5.1
+  intl: ^0.19.0
+
+  # Share audio files (WhatsApp, etc.)
+  share_plus: ^10.0.2
+
+  # Backend requests (optional)
+  http: ^1.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/animations/animal.json
+    - assets/images/9351.jpg
+    - assets/images/logo.png
+    - assets/images/applogo.png
+    - assets/images/start.jpg
+    - assets/images/options.jpg
+    - assets/images/options-bg.png
+    - assets/images/profile.png
+    - assets/images/record.png
+    - assets/images/mode-1.png
+    - assets/images/mode-2.png
+    - assets/images/mode-3.png
+    - assets/images/mode-4.png
