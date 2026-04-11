@@ -8,8 +8,9 @@ import 'package:flutter/material.dart';
 class Mode4PlayfulView extends StatefulWidget {
   final double normalized;
   final Color accent;
+  final int maxLevel;
 
-  const Mode4PlayfulView({super.key, required this.normalized, required this.accent});
+  const Mode4PlayfulView({super.key, required this.normalized, required this.accent, this.maxLevel = 10});
 
   @override
   State<Mode4PlayfulView> createState() => _Mode4PlayfulViewState();
@@ -293,9 +294,22 @@ class _Mode4PlayfulViewState extends State<Mode4PlayfulView>
                   BoxShadow(color: color.withOpacity(0.30), blurRadius: 16, offset: const Offset(0, 10)),
                 ],
               ),
-              child: Text('${(n * 100).round()}%',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 24,
-                  shadows: [Shadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 4)])),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(
+                    '${(n * widget.maxLevel).round()}',
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 28,
+                      shadows: [Shadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 4)]),
+                  ),
+                  Text(
+                    ' / ${widget.maxLevel}',
+                    style: TextStyle(color: Colors.white.withOpacity(0.65), fontWeight: FontWeight.w800, fontSize: 15),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

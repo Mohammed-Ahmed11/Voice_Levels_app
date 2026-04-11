@@ -4,10 +4,6 @@ import '../models/parent_profile.dart';
 import '../routes.dart';
 import '../services/local_db.dart';
 
-// ═══════════════════════════════════════════════════════════
-//  ProfileScreen — Kids Playful UI
-// ═══════════════════════════════════════════════════════════
-
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -15,14 +11,12 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen>
-    with TickerProviderStateMixin {
+class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateMixin {
   final _name  = TextEditingController();
   final _phone = TextEditingController();
   final _child = TextEditingController();
   final _notes = TextEditingController();
 
-  late final AnimationController _floatCtrl;
   late final AnimationController _bgFloat1;
   late final AnimationController _bgFloat2;
   late final AnimationController _saveCtrl;
@@ -30,27 +24,164 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   bool _saved = false;
 
+  List<ParentProfile> _profiles = [];
+  String? _selectedId; // ✅ current patient
+
   @override
   void initState() {
     super.initState();
-    final p = LocalDb.getProfile();
-    if (p != null) {
-      _name.text  = p.parentName;
-      _phone.text = p.phone;
-      _child.text = p.childName;
-      _notes.text = p.notes;
-    }
 
-    _floatCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 2800))
-      ..repeat(reverse: true);
-    _bgFloat1 = AnimationController(vsync: this, duration: const Duration(milliseconds: 3200))
-      ..repeat(reverse: true);
-    _bgFloat2 = AnimationController(vsync: this, duration: const Duration(milliseconds: 2500))
-      ..repeat(reverse: true);
+    _bgFloat1 = AnimationController(vsync: this, duration: const Duration(milliseconds: 3200))..repeat(reverse: true);
+    _bgFloat2 = AnimationController(vsync: this, duration: const Duration(milliseconds: 2500))..repeat(reverse: true);
 
     _saveCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 120));
-    _saveScale = Tween<double>(begin: 1.0, end: 0.93)
-        .animate(CurvedAnimation(parent: _saveCtrl, curve: Curves.easeOut));
+    _saveScale = Tween<double>(begin: 1.0, end: 0.93).animate(
+      CurvedAnimation(parent: _saveCtrl, curve: Curves.easeOut),
+    );
+
+    _loadProfiles();
+  }
+
+  void _loadProfiles() {
+    final profiles = LocalDb.getProfiles();
+    final activeId = LocalDb.getActiveProfileId();
+
+    setState(() {
+      _profiles = profiles;
+      _selectedId = activeId ?? (profiles.isNotEmpty ? profiles.first.id : null);
+    });
+
+    if (_selectedId != null) {
+      final p = _profiles.firstWhere((e) => e.id == _selectedId, orElse: () => _profiles.first);
+      _fillForm(p);
+    }
+  }
+
+  void _fillForm(ParentProfile p) {
+    _name.text  = p.parentName;
+    _phone.text = p.phone;
+    _child.text = p.childName;
+    _notes.text = p.notes;
+  }
+
+  void _clearForm() {
+    _name.clear();
+    _phone.clear();
+    _child.clear();
+    _notes.clear();
+  }
+
+  String _newId() => DateTime.now().microsecondsSinceEpoch.toString();
+
+  Future<void> _selectProfile(String id) async {
+    final p = _profiles.firstWhere((e) => e.id == id);
+    setState(() => _selectedId = id);
+    _fillForm(p);
+    await LocalDb.setActiveProfileId(id);
+  }
+
+  Future<void> _addNewProfile() async {
+    setState(() => _selectedId = null);
+    _clearForm();
+    _child.text = 'Patient ${_profiles.length + 1}';
+  }
+
+  Future<void> _save() async {
+    await _saveCtrl.forward();
+    await _saveCtrl.reverse();
+
+    final id = _selectedId ?? _newId();
+
+    final profile = ParentProfile(
+      id: id,
+      parentName: _name.text.trim(),
+      phone: _phone.text.trim(),
+      childName: _child.text.trim(),
+      notes: _notes.text.trim(),
+    );
+
+    await LocalDb.upsertProfile(profile);
+    await LocalDb.setActiveProfileId(id);
+
+    setState(() {
+      _saved = true;
+      _selectedId = id;
+      _profiles = LocalDb.getProfiles();
+    });
+
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) setState(() => _saved = false);
+  }
+
+  Future<void> _confirmDeleteCurrent() async {
+    final id = _selectedId;
+    if (id == null) return;
+
+    final p = _profiles.firstWhere((e) => e.id == id, orElse: () => _profiles.first);
+
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: const Color(0xFFFFF4E8),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('🗑️', style: TextStyle(fontSize: 44)),
+              const SizedBox(height: 10),
+              Text(
+                'Delete "${p.childName.isEmpty ? 'Patient' : p.childName}"?',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF3D3D3D)),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'This will delete this patient and their recordings.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 13, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(context, false),
+                      child: Container(
+                        height: 44,
+                        decoration: BoxDecoration(color: const Color(0xFFE8E0D5), borderRadius: BorderRadius.circular(14)),
+                        child: const Center(child: Text('Cancel', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF3D3D3D)))),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(context, true),
+                      child: Container(
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF6B6B),
+                          borderRadius: BorderRadius.circular(14),
+                          boxShadow: const [BoxShadow(color: Color(0xFFCC3333), blurRadius: 0, offset: Offset(0, 4))],
+                        ),
+                        child: const Center(child: Text('Delete', style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white))),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    // if (ok == true) {
+    //   await LocalDb.deleteProfile(id);
+    //   _loadProfiles();
+    // }
   }
 
   @override
@@ -59,28 +190,10 @@ class _ProfileScreenState extends State<ProfileScreen>
     _phone.dispose();
     _child.dispose();
     _notes.dispose();
-    _floatCtrl.dispose();
     _bgFloat1.dispose();
     _bgFloat2.dispose();
     _saveCtrl.dispose();
     super.dispose();
-  }
-
-  Future<void> _save() async {
-    await _saveCtrl.forward();
-    await _saveCtrl.reverse();
-
-    final profile = ParentProfile(
-      parentName: _name.text.trim(),
-      phone:      _phone.text.trim(),
-      childName:  _child.text.trim(),
-      notes:      _notes.text.trim(),
-    );
-    await LocalDb.saveProfile(profile);
-
-    setState(() => _saved = true);
-    await Future.delayed(const Duration(seconds: 2));
-    if (mounted) setState(() => _saved = false);
   }
 
   @override
@@ -90,13 +203,11 @@ class _ProfileScreenState extends State<ProfileScreen>
       resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
-          // ── Pastel blobs ──
           Positioned(top: -70, left: -50,  child: _Blob(color: const Color(0xFFD6ECFF), size: 250)),
           Positioned(top: 80,  right: -60, child: _Blob(color: const Color(0xFFFFDFDF), size: 200)),
           Positioned(bottom: 140, left: -50, child: _Blob(color: const Color(0xFFD6FFE4), size: 210)),
           Positioned(bottom: -50, right: 0,  child: _Blob(color: const Color(0xFFFFF0C8), size: 180)),
 
-          // ── Floating bg animals ──
           AnimatedBuilder(
             animation: _bgFloat1,
             builder: (_, __) => Positioned(
@@ -126,16 +237,13 @@ class _ProfileScreenState extends State<ProfileScreen>
             ),
           ),
 
-          // ── Main content ──
           SafeArea(
             child: Column(
               children: [
-                // Header
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
                   child: Row(
                     children: [
-                      // Back button
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
                         child: Container(
@@ -143,63 +251,89 @@ class _ProfileScreenState extends State<ProfileScreen>
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(15),
-                            boxShadow: [BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
-                              blurRadius: 12, offset: const Offset(0, 4),
-                            )],
+                            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 12, offset: const Offset(0, 4))],
                           ),
-                          child: const Icon(Icons.arrow_back_ios_new_rounded,
-                              size: 18, color: Color(0xFF3D3D3D)),
+                          child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Color(0xFF3D3D3D)),
                         ),
                       ),
                       const SizedBox(width: 14),
-
-                      // Floating mascot + title
-                      // AnimatedBuilder(
-                      //   animation: _floatCtrl,
-                      //   builder: (_, child) => Transform.translate(
-                      //     offset: Offset(0, sin(_floatCtrl.value * pi) * 5),
-                      //     child: child,
-                      //   ),
-                      //   child: CustomPaint(
-                      //     size: const Size(46, 46),
-                      //     painter: const _BearPainter(color: Color(0xFFFF6B6B)),
-                      //   ),
-                      // ),
                       const SizedBox(width: 10),
-                      RichText(
-                        text: const TextSpan(children: [
-                          TextSpan(
-                            text: 'My ',
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Color(0xFF3D3D3D)),
+                      const Text(
+                        'Patients',
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFF9C8AE6)),
+                      ),
+                      const Spacer(),
+                      if (_selectedId != null)
+                        GestureDetector(
+                          onTap: _confirmDeleteCurrent,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFF6B6B).withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Text('🗑️', style: TextStyle(fontSize: 16)),
                           ),
-                          TextSpan(
-                            text: 'Profile',
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFF9C8AE6)),
+                        ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    'Create a profile for each patient so recordings don’t get mixed.',
+                    style: TextStyle(fontSize: 13, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
+                  ),
+                ),
+
+                const SizedBox(height: 14),
+
+                // ✅ Profiles bar
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              for (final p in _profiles) ...[
+                                _ProfileChip(
+                                  label: (p.childName.trim().isEmpty ? 'Patient' : p.childName.trim()),
+                                  selected: p.id == _selectedId,
+                                  onTap: () => _selectProfile(p.id),
+                                ),
+                                const SizedBox(width: 10),
+                              ],
+                            ],
                           ),
-                        ]),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: _addNewProfile,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF9C8AE6),
+                            borderRadius: BorderRadius.circular(18),
+                            boxShadow: const [BoxShadow(color: Color(0xFF6D5CC7), blurRadius: 0, offset: Offset(0, 4))],
+                          ),
+                          child: const Text('➕', style: TextStyle(fontSize: 16)),
+                        ),
                       ),
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 6),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text(
-                    'Tell us about you & your little one 🍼',
-                    style: TextStyle(fontSize: 13, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
-                  ),
-                ),
+                const SizedBox(height: 14),
 
-                const SizedBox(height: 18),
-
-                // Form
                 Expanded(
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
                     children: [
-                      // ── Parent section ──
                       _SectionLabel(emoji: '👨‍👩‍👧', label: 'Parent Info'),
                       const SizedBox(height: 10),
                       _KidsField(
@@ -215,19 +349,18 @@ class _ProfileScreenState extends State<ProfileScreen>
                         controller: _phone,
                         label: 'Phone Number',
                         emoji: '📞',
-                        hint: 'e.g. +1 555 0123',
+                        hint: 'e.g. +20 ...',
                         color: const Color(0xFF6BCB77),
                         keyboardType: TextInputType.phone,
                       ),
 
                       const SizedBox(height: 22),
 
-                      // ── Child section ──
-                      _SectionLabel(emoji: '👶', label: 'Child Info'),
+                      _SectionLabel(emoji: '👶', label: 'Patient Info'),
                       const SizedBox(height: 10),
                       _KidsField(
                         controller: _child,
-                        label: 'Child Name',
+                        label: 'Patient Name',
                         emoji: '🌟',
                         hint: 'e.g. Lily',
                         color: const Color(0xFFFF9F1C),
@@ -243,9 +376,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                         maxLines: 3,
                       ),
 
-                      const SizedBox(height: 28),
+                      const SizedBox(height: 24),
 
-                      // ── Save button ──
                       AnimatedBuilder(
                         animation: _saveScale,
                         builder: (_, child) => Transform.scale(scale: _saveScale.value, child: child),
@@ -261,14 +393,12 @@ class _ProfileScreenState extends State<ProfileScreen>
                               borderRadius: BorderRadius.circular(22),
                               boxShadow: [
                                 BoxShadow(
-                                  color: (_saved ? const Color(0xFF3A9947) : const Color(0xFFCC3333))
-                                      .withOpacity(0.55),
+                                  color: (_saved ? const Color(0xFF3A9947) : const Color(0xFFCC3333)).withOpacity(0.55),
                                   blurRadius: 0,
                                   offset: const Offset(0, 6),
                                 ),
                                 BoxShadow(
-                                  color: (_saved ? const Color(0xFF3A9947) : const Color(0xFFCC3333))
-                                      .withOpacity(0.25),
+                                  color: (_saved ? const Color(0xFF3A9947) : const Color(0xFFCC3333)).withOpacity(0.25),
                                   blurRadius: 18,
                                   offset: const Offset(0, 12),
                                 ),
@@ -277,13 +407,10 @@ class _ProfileScreenState extends State<ProfileScreen>
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(
-                                  _saved ? '✅' : '💾',
-                                  style: const TextStyle(fontSize: 22),
-                                ),
+                                Text(_saved ? '✅' : '💾', style: const TextStyle(fontSize: 22)),
                                 const SizedBox(width: 10),
                                 Text(
-                                  _saved ? 'Saved!' : 'Save Profile',
+                                  _saved ? 'Saved!' : (_selectedId == null ? 'Create Patient' : 'Save Changes'),
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 17,
@@ -303,7 +430,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                   ),
                 ),
 
-                // Bottom nav
                 _BottomBar(screenContext: context),
                 const SizedBox(height: 16),
               ],
@@ -315,9 +441,46 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 }
 
-// ═══════════════════════════════════════════════════════════
-//  Kids-styled text field
-// ═══════════════════════════════════════════════════════════
+// ───────────────────────── UI helpers ─────────────────────────
+
+class _ProfileChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _ProfileChip({required this.label, required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: selected ? const Color(0xFF9C8AE6) : Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: selected ? const Color(0xFF9C8AE6) : const Color(0xFFE8E0D5), width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: selected ? const Color(0xFF9C8AE6).withOpacity(0.25) : Colors.black.withOpacity(0.05),
+              blurRadius: 12,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12.5,
+            fontWeight: FontWeight.w900,
+            color: selected ? Colors.white : const Color(0xFF3D3D3D),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class _KidsField extends StatefulWidget {
   final TextEditingController controller;
@@ -354,18 +517,12 @@ class _KidsFieldState extends State<_KidsField> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: _focused
-                ? widget.color.withOpacity(0.35)
-                : Colors.black.withOpacity(0.07),
+            color: _focused ? widget.color.withOpacity(0.35) : Colors.black.withOpacity(0.07),
             blurRadius: _focused ? 0 : 10,
-            spreadRadius: 0,
             offset: _focused ? const Offset(0, 5) : const Offset(0, 3),
           ),
         ],
-        border: Border.all(
-          color: _focused ? widget.color : Colors.transparent,
-          width: _focused ? 2.5 : 0,
-        ),
+        border: Border.all(color: _focused ? widget.color : Colors.transparent, width: _focused ? 2.5 : 0),
       ),
       child: Focus(
         onFocusChange: (f) => setState(() => _focused = f),
@@ -373,11 +530,7 @@ class _KidsFieldState extends State<_KidsField> {
           controller: widget.controller,
           keyboardType: widget.keyboardType,
           maxLines: widget.maxLines,
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF2D2D2D),
-          ),
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF2D2D2D)),
           decoration: InputDecoration(
             hintText: widget.hint,
             hintStyle: TextStyle(color: Colors.grey.shade400, fontWeight: FontWeight.w500),
@@ -393,20 +546,13 @@ class _KidsFieldState extends State<_KidsField> {
             ),
             prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
             border: InputBorder.none,
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: widget.maxLines > 1 ? 14 : 0,
-            ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: widget.maxLines > 1 ? 14 : 0),
           ),
         ),
       ),
     );
   }
 }
-
-// ═══════════════════════════════════════════════════════════
-//  Section label
-// ═══════════════════════════════════════════════════════════
 
 class _SectionLabel extends StatelessWidget {
   final String emoji;
@@ -421,31 +567,19 @@ class _SectionLabel extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w900,
-            color: Color(0xFF3D3D3D),
-            letterSpacing: -0.2,
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFF3D3D3D), letterSpacing: -0.2),
         ),
         const SizedBox(width: 10),
         Expanded(
           child: Container(
             height: 2,
-            decoration: BoxDecoration(
-              color: const Color(0xFFE8E0D5),
-              borderRadius: BorderRadius.circular(2),
-            ),
+            decoration: BoxDecoration(color: const Color(0xFFE8E0D5), borderRadius: BorderRadius.circular(2)),
           ),
         ),
       ],
     );
   }
 }
-
-// ═══════════════════════════════════════════════════════════
-//  Bottom Nav Bar
-// ═══════════════════════════════════════════════════════════
 
 class _BottomBar extends StatelessWidget {
   final BuildContext screenContext;
@@ -460,24 +594,14 @@ class _BottomBar extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF2D2D2D),
           borderRadius: BorderRadius.circular(28),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.18),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.18), blurRadius: 20, offset: const Offset(0, 8))],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _NavItem(emoji: '🏠', label: 'Home',
-                onTap: () => Navigator.pushNamedAndRemoveUntil(
-                    screenContext, AppRoutes.home, (r) => false)),
-            _NavItem(emoji: '🎵', label: 'Records',
-                onTap: () => Navigator.pushNamed(screenContext, AppRoutes.recordings)),
-            _NavItem(emoji: '⚙️', label: 'Options',
-                onTap: () => Navigator.pushNamed(screenContext, AppRoutes.settings)),
+            _NavItem(emoji: '🏠', label: 'Home', onTap: () => Navigator.pushNamedAndRemoveUntil(screenContext, AppRoutes.home, (r) => false)),
+            _NavItem(emoji: '🎵', label: 'Records', onTap: () => Navigator.pushNamed(screenContext, AppRoutes.recordings)),
+            _NavItem(emoji: '⚙️', label: 'Options', onTap: () => Navigator.pushNamed(screenContext, AppRoutes.settings)),
           ],
         ),
       ),
@@ -518,9 +642,7 @@ class _NavItemState extends State<_NavItem> {
             children: [
               Text(widget.emoji, style: const TextStyle(fontSize: 20)),
               const SizedBox(height: 3),
-              Text(widget.label,
-                  style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700,
-                      color: Colors.white.withOpacity(0.85))),
+              Text(widget.label, style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: Colors.white.withOpacity(0.85))),
             ],
           ),
         ),
@@ -529,47 +651,14 @@ class _NavItemState extends State<_NavItem> {
   }
 }
 
-// ═══════════════════════════════════════════════════════════
-//  Animal Painters (shared with other screens)
-// ═══════════════════════════════════════════════════════════
-
 class _BearPainter extends CustomPainter {
   final Color color;
   const _BearPainter({required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final p     = Paint()..color = color..style = PaintingStyle.fill;
-    final dark  = Paint()..color = color.withOpacity(0.55);
-    final white = Paint()..color = Colors.white.withOpacity(0.92);
-    final black = Paint()..color = const Color(0xFF1A1A1A);
-    final cx = size.width / 2;
-    final cy = size.height / 2;
-    final r  = size.width * 0.34;
-
-    canvas.drawCircle(Offset(cx - r * 0.68, cy - r * 0.74), r * 0.36, p);
-    canvas.drawCircle(Offset(cx + r * 0.68, cy - r * 0.74), r * 0.36, p);
-    canvas.drawCircle(Offset(cx - r * 0.68, cy - r * 0.74), r * 0.20, dark);
-    canvas.drawCircle(Offset(cx + r * 0.68, cy - r * 0.74), r * 0.20, dark);
-    canvas.drawCircle(Offset(cx, cy), r, p);
-    canvas.drawOval(Rect.fromCenter(center: Offset(cx, cy + r * 0.34), width: r * 0.96, height: r * 0.60), dark);
-    canvas.drawCircle(Offset(cx - r * 0.34, cy - r * 0.14), r * 0.15, white);
-    canvas.drawCircle(Offset(cx + r * 0.34, cy - r * 0.14), r * 0.15, white);
-    canvas.drawCircle(Offset(cx - r * 0.32, cy - r * 0.12), r * 0.09, black);
-    canvas.drawCircle(Offset(cx + r * 0.32, cy - r * 0.12), r * 0.09, black);
-    canvas.drawCircle(Offset(cx - r * 0.27, cy - r * 0.17), r * 0.04, white);
-    canvas.drawCircle(Offset(cx + r * 0.37, cy - r * 0.17), r * 0.04, white);
-    canvas.drawCircle(Offset(cx, cy + r * 0.18), r * 0.11, black);
-    final smile = Path()
-      ..moveTo(cx - r * 0.22, cy + r * 0.30)
-      ..quadraticBezierTo(cx, cy + r * 0.52, cx + r * 0.22, cy + r * 0.30);
-    canvas.drawPath(smile, Paint()
-      ..color = const Color(0xFF1A1A1A)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width * 0.040
-      ..strokeCap = StrokeCap.round);
-    canvas.drawCircle(Offset(cx - r * 0.58, cy + r * 0.16), r * 0.16, Paint()..color = Colors.pink.withOpacity(0.38));
-    canvas.drawCircle(Offset(cx + r * 0.58, cy + r * 0.16), r * 0.16, Paint()..color = Colors.pink.withOpacity(0.38));
+    final p = Paint()..color = color..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(size.width * 0.5, size.height * 0.55), size.width * 0.34, p);
   }
 
   @override
@@ -582,52 +671,13 @@ class _BunnyPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final p     = Paint()..color = color..style = PaintingStyle.fill;
-    final white = Paint()..color = Colors.white.withOpacity(0.92);
-    final black = Paint()..color = const Color(0xFF1A1A1A);
-    final pink  = Paint()..color = const Color(0xFFFFB3C6);
-    final cx = size.width / 2;
-    final cy = size.height / 2;
-    final r  = size.width * 0.30;
-
-    canvas.drawRRect(RRect.fromRectAndRadius(
-      Rect.fromCenter(center: Offset(cx - r * 0.40, cy - r * 1.28), width: r * 0.46, height: r * 1.08),
-      const Radius.circular(30)), p);
-    canvas.drawRRect(RRect.fromRectAndRadius(
-      Rect.fromCenter(center: Offset(cx + r * 0.40, cy - r * 1.28), width: r * 0.46, height: r * 1.08),
-      const Radius.circular(30)), p);
-    canvas.drawRRect(RRect.fromRectAndRadius(
-      Rect.fromCenter(center: Offset(cx - r * 0.40, cy - r * 1.28), width: r * 0.22, height: r * 0.76),
-      const Radius.circular(20)), pink);
-    canvas.drawRRect(RRect.fromRectAndRadius(
-      Rect.fromCenter(center: Offset(cx + r * 0.40, cy - r * 1.28), width: r * 0.22, height: r * 0.76),
-      const Radius.circular(20)), pink);
-    canvas.drawCircle(Offset(cx, cy), r, p);
-    canvas.drawCircle(Offset(cx - r * 0.52, cy + r * 0.20), r * 0.22, Paint()..color = Colors.pink.withOpacity(0.38));
-    canvas.drawCircle(Offset(cx + r * 0.52, cy + r * 0.20), r * 0.22, Paint()..color = Colors.pink.withOpacity(0.38));
-    canvas.drawCircle(Offset(cx - r * 0.32, cy - r * 0.10), r * 0.15, white);
-    canvas.drawCircle(Offset(cx + r * 0.32, cy - r * 0.10), r * 0.15, white);
-    canvas.drawCircle(Offset(cx - r * 0.30, cy - r * 0.08), r * 0.09, black);
-    canvas.drawCircle(Offset(cx + r * 0.30, cy - r * 0.08), r * 0.09, black);
-    canvas.drawCircle(Offset(cx - r * 0.24, cy - r * 0.14), r * 0.04, white);
-    canvas.drawCircle(Offset(cx + r * 0.36, cy - r * 0.14), r * 0.04, white);
-    canvas.drawCircle(Offset(cx, cy + r * 0.17), r * 0.11, pink);
-    final smile = Path()
-      ..moveTo(cx - r * 0.22, cy + r * 0.32)
-      ..quadraticBezierTo(cx, cy + r * 0.52, cx + r * 0.22, cy + r * 0.32);
-    canvas.drawPath(smile, Paint()
-      ..color = const Color(0xFF1A1A1A)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width * 0.040
-      ..strokeCap = StrokeCap.round);
-    canvas.drawCircle(Offset(cx + r * 0.80, cy + r * 0.68), r * 0.18, white);
+    final p = Paint()..color = color..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(size.width * 0.5, size.height * 0.55), size.width * 0.30, p);
   }
 
   @override
   bool shouldRepaint(covariant _BunnyPainter old) => old.color != color;
 }
-
-// ─── Blob helper ──────────────────────────────────────────
 
 class _Blob extends StatelessWidget {
   final Color color;
@@ -636,8 +686,7 @@ class _Blob extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-      );
+    width: size, height: size,
+    decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+  );
 }

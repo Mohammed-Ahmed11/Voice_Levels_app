@@ -13,11 +13,15 @@ import 'package:flutter/material.dart';
 class Mode1ClassicView extends StatefulWidget {
   final double normalized;
   final Color accent;
+  /// Max level ceiling from AppSettings (10 or 20).
+  /// Used to label the percentage readout and zone thresholds.
+  final int maxLevel;
 
   const Mode1ClassicView({
     super.key,
     required this.normalized,
     required this.accent,
+    this.maxLevel = 10,
   });
 
   @override
@@ -301,14 +305,29 @@ class _Mode1ClassicViewState extends State<Mode1ClassicView>
                     BoxShadow(color: color.withOpacity(0.30), blurRadius: 14, offset: const Offset(0, 8)),
                   ],
                 ),
-                child: Text(
-                  '${(n * 100).round()}%',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 22,
-                    shadows: [Shadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 4)],
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      '${(n * widget.maxLevel).round()}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 26,
+                        shadows: [Shadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 4)],
+                      ),
+                    ),
+                    Text(
+                      ' / ${widget.maxLevel}',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.70),
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             );

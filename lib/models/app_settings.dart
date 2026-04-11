@@ -1,8 +1,12 @@
+// ═══════════════════════════════════════════════════════════
+//  AppSettings model
+// ═══════════════════════════════════════════════════════════
+
 class AppSettings {
   final String recordingQuality; // high | medium | low
-  final int maxLevel; // 10 | 20
-  final int countdownSeconds; // 0 | 3 | 5
-  final bool soundEffects; // true/false
+  final int maxLevel;            // 10 | 20
+  final int countdownSeconds;    // 0 | 3 | 5
+  final bool soundEffects;       // true | false
 
   const AppSettings({
     required this.recordingQuality,
@@ -40,9 +44,12 @@ class AppSettings {
       };
 
   factory AppSettings.fromJson(Map<String, dynamic> json) => AppSettings(
-        recordingQuality: (json['recordingQuality'] ?? 'medium').toString(),
-        maxLevel: int.tryParse((json['maxLevel'] ?? 10).toString()) ?? 10,
-        countdownSeconds: int.tryParse((json['countdownSeconds'] ?? 3).toString()) ?? 3,
+        recordingQuality:
+            (json['recordingQuality'] ?? 'medium').toString(),
+        maxLevel:
+            int.tryParse((json['maxLevel'] ?? 10).toString()) ?? 10,
+        countdownSeconds:
+            int.tryParse((json['countdownSeconds'] ?? 3).toString()) ?? 3,
         soundEffects: (json['soundEffects'] ?? true) == true,
       );
 }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../routes.dart';
 
 // ═══════════════════════════════════════════════════════════
-//  ModeSelectScreen — Kids Cartoon UI (Animals on cards + BG)
+//  ModeSelectScreen — Kids Cartoon UI (Improved)
 // ═══════════════════════════════════════════════════════════
 
 class ModeSelectScreen extends StatefulWidget {
@@ -19,6 +19,7 @@ class _ModeSelectScreenState extends State<ModeSelectScreen>
   late final AnimationController _bgFloat2;
   late final AnimationController _bgFloat3;
   late final AnimationController _bgFloat4;
+  late final AnimationController _headerAnim;
   late final List<AnimationController> _cardControllers;
   late final List<Animation<double>> _cardFades;
   late final List<Animation<Offset>> _cardSlides;
@@ -29,11 +30,13 @@ class _ModeSelectScreenState extends State<ModeSelectScreen>
       title: 'Classic',
       desc: 'Simple level meter',
       animal: _Animal.bear,
-      bgColor: Color(0xFF4D96FF),
-      accentColor: Color(0xFF82B8FF),
-      shadowColor: Color(0xFF2260CC),
+      bgColor: Color(0xFF3A86FF),
+      accentColor: Color(0xFF6AAEFF),
+      shadowColor: Color(0xFF1A5CC8),
       bgImage: 'assets/images/mode-1.png',
       overlay: 0.30,
+      tagEmoji: '⚡',
+      tagLabel: 'Popular',
     ),
     _ModeData(
       id: '2',
@@ -42,31 +45,37 @@ class _ModeSelectScreenState extends State<ModeSelectScreen>
       animal: _Animal.duck,
       bgColor: Color(0xFFFF9F1C),
       accentColor: Color(0xFFFFBF6A),
-      shadowColor: Color(0xFFCC7A00),
+      shadowColor: Color(0xFFB86A00),
       bgImage: 'assets/images/mode-2.png',
       overlay: 0.32,
+      tagEmoji: '✨',
+      tagLabel: 'Smooth',
     ),
     _ModeData(
       id: '3',
       title: 'Thick Meter',
       desc: 'Bold & clear levels',
       animal: _Animal.cat,
-      bgColor: Color(0xFFB66DFF),
-      accentColor: Color(0xFFCE99FF),
-      shadowColor: Color(0xFF7A30CC),
+      bgColor: Color(0xFFAB5CF7),
+      accentColor: Color(0xFFC98AF9),
+      shadowColor: Color(0xFF6B22B0),
       bgImage: 'assets/images/mode-3.png',
       overlay: 0.34,
+      tagEmoji: '💪',
+      tagLabel: 'Bold',
     ),
     _ModeData(
       id: '4',
       title: 'Playful',
       desc: 'Fun child-friendly UI',
       animal: _Animal.bunny,
-      bgColor: Color(0xFF6BCB77),
-      accentColor: Color(0xFF96DFA0),
-      shadowColor: Color(0xFF3A9947),
+      bgColor: Color(0xFF2ECC71),
+      accentColor: Color(0xFF65DBA0),
+      shadowColor: Color(0xFF1A8A4A),
       bgImage: 'assets/images/mode-4.png',
       overlay: 0.28,
+      tagEmoji: '🎉',
+      tagLabel: 'Fun',
     ),
   ];
 
@@ -74,7 +83,9 @@ class _ModeSelectScreenState extends State<ModeSelectScreen>
   void initState() {
     super.initState();
 
-    // Independent float controllers for each background animal
+    _headerAnim = AnimationController(vsync: this, duration: const Duration(milliseconds: 600))
+      ..forward();
+
     _bgFloat1 = AnimationController(vsync: this, duration: const Duration(milliseconds: 3200))..repeat(reverse: true);
     _bgFloat2 = AnimationController(vsync: this, duration: const Duration(milliseconds: 2700))..repeat(reverse: true);
     _bgFloat3 = AnimationController(vsync: this, duration: const Duration(milliseconds: 3600))..repeat(reverse: true);
@@ -82,18 +93,20 @@ class _ModeSelectScreenState extends State<ModeSelectScreen>
 
     _cardControllers = List.generate(
       _modes.length,
-      (i) => AnimationController(vsync: this, duration: const Duration(milliseconds: 540)),
+      (i) => AnimationController(vsync: this, duration: const Duration(milliseconds: 560)),
     );
+
     _cardFades = _cardControllers
         .map((c) => CurvedAnimation(parent: c, curve: Curves.easeOut))
         .toList();
+
     _cardSlides = _cardControllers
-        .map((c) => Tween<Offset>(begin: const Offset(0, 0.26), end: Offset.zero)
+        .map((c) => Tween<Offset>(begin: const Offset(0, 0.30), end: Offset.zero)
             .animate(CurvedAnimation(parent: c, curve: Curves.easeOutBack)))
         .toList();
 
     for (int i = 0; i < _cardControllers.length; i++) {
-      Future.delayed(Duration(milliseconds: 160 + i * 120), () {
+      Future.delayed(Duration(milliseconds: 200 + i * 110), () {
         if (mounted) _cardControllers[i].forward();
       });
     }
@@ -105,6 +118,7 @@ class _ModeSelectScreenState extends State<ModeSelectScreen>
     _bgFloat2.dispose();
     _bgFloat3.dispose();
     _bgFloat4.dispose();
+    _headerAnim.dispose();
     for (final c in _cardControllers) c.dispose();
     super.dispose();
   }
@@ -122,7 +136,7 @@ class _ModeSelectScreenState extends State<ModeSelectScreen>
     return AnimatedBuilder(
       animation: ctrl,
       builder: (_, __) => Positioned(
-        top: baseTop + sin(ctrl.value * pi) * 10,
+        top: baseTop + sin(ctrl.value * pi) * 12,
         left: left,
         right: right,
         child: Opacity(
@@ -139,132 +153,138 @@ class _ModeSelectScreenState extends State<ModeSelectScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF4E8),
+      backgroundColor: const Color(0xFFFFF6ED),
       body: Stack(
         children: [
-          // ── Pastel background blobs ──
-          Positioned(top: -70, left: -50, child: _Blob(color: const Color(0xFFD6ECFF), size: 250)),
-          Positioned(top: 80, right: -60, child: _Blob(color: const Color(0xFFFFDFDF), size: 200)),
-          Positioned(bottom: 130, left: -50, child: _Blob(color: const Color(0xFFD6FFE4), size: 210)),
-          Positioned(bottom: -50, right: 0, child: _Blob(color: const Color(0xFFFFF0C8), size: 180)),
+          // Background blobs — more varied sizes and positions
+          Positioned(top: -90, left: -60, child: _Blob(color: const Color(0xFFCFE5FF), size: 280)),
+          Positioned(top: 100, right: -70, child: _Blob(color: const Color(0xFFFFDDDD), size: 220)),
+          Positioned(bottom: 160, left: -60, child: _Blob(color: const Color(0xFFC9F7DE), size: 240)),
+          Positioned(bottom: -60, right: -20, child: _Blob(color: const Color(0xFFFFF0C8), size: 200)),
+          // Extra tiny accent blobs
+          Positioned(top: 280, left: 80, child: _Blob(color: const Color(0xFFFDE8FF), size: 90)),
+          Positioned(top: 350, right: 60, child: _Blob(color: const Color(0xFFDFF5FF), size: 70)),
 
-          // ── Floating background animals ──
+          // Background dot pattern
+          Positioned.fill(child: CustomPaint(painter: _DotGridPainter())),
+
+          // Background floating animals
           _bgAnimal(
             ctrl: _bgFloat1,
-            painter: _BearPainter(color: const Color(0xFF4D96FF)),
-            size: 110,
-            opacity: 0.13,
+            painter: _BearPainter(color: const Color(0xFF3A86FF)),
+            size: 115,
+            opacity: 0.11,
             angle: -0.25,
-            baseTop: 80,
-            left: -20,
+            baseTop: 90,
+            left: -22,
             right: null,
           ),
           _bgAnimal(
             ctrl: _bgFloat2,
             painter: _DuckPainter(color: const Color(0xFFFF9F1C)),
-            size: 95,
-            opacity: 0.14,
+            size: 100,
+            opacity: 0.12,
             angle: 0.20,
             baseTop: 60,
             left: null,
-            right: -22,
+            right: -24,
           ),
           _bgAnimal(
             ctrl: _bgFloat3,
-            painter: _BunnyPainter(color: const Color(0xFF6BCB77)),
-            size: 100,
-            opacity: 0.13,
+            painter: _BunnyPainter(color: const Color(0xFF2ECC71)),
+            size: 105,
+            opacity: 0.11,
             angle: -0.15,
-            baseTop: 440,
-            left: -18,
+            baseTop: 450,
+            left: -20,
             right: null,
           ),
           _bgAnimal(
             ctrl: _bgFloat4,
-            painter: _CatPainter(color: const Color(0xFFB66DFF)),
-            size: 92,
-            opacity: 0.13,
+            painter: _CatPainter(color: const Color(0xFFAB5CF7)),
+            size: 96,
+            opacity: 0.11,
             angle: 0.22,
-            baseTop: 400,
+            baseTop: 420,
             left: null,
-            right: -18,
+            right: -20,
           ),
 
-          // ── Main UI ──
           SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-                  child: Row(
-                    children: [
-                      // Back button
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Container(
-                          width: 46,
-                          height: 46,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(15),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.08),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
+                FadeTransition(
+                  opacity: CurvedAnimation(parent: _headerAnim, curve: Curves.easeOut),
+                  child: SlideTransition(
+                    position: Tween<Offset>(begin: const Offset(0, -0.3), end: Offset.zero)
+                        .animate(CurvedAnimation(parent: _headerAnim, curve: Curves.easeOutBack)),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+                      child: Row(
+                        children: [
+                          _BackButton(onTap: () => Navigator.pop(context)),
+                          const SizedBox(width: 14),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              RichText(
+                                text: const TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: 'Pick a ',
+                                      style: TextStyle(
+                                        fontSize: 28,
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xFF2D2D2D),
+                                        height: 1.1,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: 'Mode!',
+                                      style: TextStyle(
+                                        fontSize: 28,
+                                        fontWeight: FontWeight.w900,
+                                        color: Color(0xFF9C8AE6 ),
+                                        height: 1.1,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF2ECC71),
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    '4 unique looks to choose from',
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                      color: Colors.grey.shade500,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                          child: const Icon(Icons.arrow_back_ios_new_rounded,
-                              size: 18, color: Color(0xFF3D3D3D)),
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          RichText(
-                            text: const TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: 'Pick a ',
-                                  style: TextStyle(
-                                    fontSize: 26,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF3D3D3D),
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: 'Mode!',
-                                  style: TextStyle(
-                                    fontSize: 26,
-                                    fontWeight: FontWeight.w900,
-                                    color: Color(0xFF9C8AE6),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Each mode has a different look & feel ✨',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.grey.shade500,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
                         ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
 
                 const SizedBox(height: 18),
 
-                // Cards grid
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -274,7 +294,7 @@ class _ModeSelectScreenState extends State<ModeSelectScreen>
                         crossAxisCount: 2,
                         crossAxisSpacing: 14,
                         mainAxisSpacing: 14,
-                        childAspectRatio: 0.80,
+                        childAspectRatio: 0.78,
                       ),
                       itemCount: _modes.length,
                       itemBuilder: (context, i) {
@@ -302,9 +322,7 @@ class _ModeSelectScreenState extends State<ModeSelectScreen>
                   ),
                 ),
 
-                const SizedBox(height: 12),
-
-                // Bottom nav
+                const SizedBox(height: 10),
                 _BottomBar(screenContext: context),
                 const SizedBox(height: 16),
               ],
@@ -316,10 +334,53 @@ class _ModeSelectScreenState extends State<ModeSelectScreen>
   }
 }
 
-// ═══════════════════════════════════════════════════════════
-//  Mode Card  — animal is the STAR of the card
-// ═══════════════════════════════════════════════════════════
+// ─── Back Button ──────────────────────────────────────────
+class _BackButton extends StatefulWidget {
+  final VoidCallback onTap;
+  const _BackButton({required this.onTap});
 
+  @override
+  State<_BackButton> createState() => _BackButtonState();
+}
+
+class _BackButtonState extends State<_BackButton> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.90 : 1.0,
+        duration: const Duration(milliseconds: 100),
+        child: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.09),
+                blurRadius: 14,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: const Icon(Icons.arrow_back_ios_new_rounded,
+              size: 18, color: Color(0xFF3D3D3D)),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Mode Card ────────────────────────────────────────────
 class _ModeCard extends StatefulWidget {
   final _ModeData data;
   final VoidCallback onTap;
@@ -333,40 +394,52 @@ class _ModeCard extends StatefulWidget {
 class _ModeCardState extends State<_ModeCard> with TickerProviderStateMixin {
   late final AnimationController _pressCtrl;
   late final AnimationController _animalBounce;
+  late final AnimationController _shimmer;
   late final Animation<double> _scaleAnim;
   late final Animation<double> _bounceAnim;
+
+  static const Color _animalColor = Color(0xFFFFFFFF);
 
   @override
   void initState() {
     super.initState();
 
-    _pressCtrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 110));
-    _scaleAnim = Tween<double>(begin: 1.0, end: 0.91)
+    _pressCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 120));
+    _scaleAnim = Tween<double>(begin: 1.0, end: 0.93)
         .animate(CurvedAnimation(parent: _pressCtrl, curve: Curves.easeOut));
 
-    // Gentle idle bounce for the animal character
     _animalBounce = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 1800 + (widget.data.id.hashCode % 600)),
+      duration: Duration(milliseconds: 1900 + (widget.data.id.hashCode % 500)),
     )..repeat(reverse: true);
+
     _bounceAnim = Tween<double>(begin: 0.0, end: 1.0)
         .animate(CurvedAnimation(parent: _animalBounce, curve: Curves.easeInOut));
+
+    _shimmer = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2200),
+    )..repeat();
   }
 
   @override
   void dispose() {
     _pressCtrl.dispose();
     _animalBounce.dispose();
+    _shimmer.dispose();
     super.dispose();
   }
 
   CustomPainter _painterFor(_Animal animal) {
     switch (animal) {
-      case _Animal.bear:  return const _BearPainter(color: Colors.white);
-      case _Animal.duck:  return const _DuckPainter(color: Colors.white);
-      case _Animal.cat:   return const _CatPainter(color: Colors.white);
-      case _Animal.bunny: return const _BunnyPainter(color: Colors.white);
+      case _Animal.bear:
+        return const _BearPainter(color: _animalColor);
+      case _Animal.duck:
+        return const _DuckPainter(color: _animalColor);
+      case _Animal.cat:
+        return const _CatPainter(color: _animalColor);
+      case _Animal.bunny:
+        return const _BunnyPainter(color: _animalColor);
     }
   }
 
@@ -374,81 +447,157 @@ class _ModeCardState extends State<_ModeCard> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTapDown: (_) => _pressCtrl.forward(),
-      onTapUp: (_) { _pressCtrl.reverse(); widget.onTap(); },
+      onTapUp: (_) {
+        _pressCtrl.reverse();
+        widget.onTap();
+      },
       onTapCancel: () => _pressCtrl.reverse(),
       child: AnimatedBuilder(
         animation: _scaleAnim,
         builder: (_, child) => Transform.scale(scale: _scaleAnim.value, child: child),
         child: Container(
           decoration: BoxDecoration(
-            color: widget.data.bgColor,
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(28),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                widget.data.bgColor,
+                widget.data.shadowColor,
+              ],
+            ),
             boxShadow: [
-              // Hard cartoon shadow
+              // Hard offset shadow (cartoon style)
               BoxShadow(
                 color: widget.data.shadowColor,
                 blurRadius: 0,
-                offset: const Offset(0, 7),
+                offset: const Offset(0, 6),
               ),
-              // Soft ambient
+              // Soft glow
               BoxShadow(
-                color: widget.data.shadowColor.withOpacity(0.32),
-                blurRadius: 22,
-                offset: const Offset(0, 14),
+                color: widget.data.bgColor.withOpacity(0.45),
+                blurRadius: 24,
+                offset: const Offset(0, 10),
               ),
             ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(28),
             child: Stack(
               children: [
-                // Wavy top strip (lighter shade)
+                // Decorative circle shapes in background
                 Positioned(
-                  top: 0, left: 0, right: 0,
-                  child: CustomPaint(
-                    size: const Size(double.infinity, 52),
-                    painter: _WavePainter(widget.data.accentColor),
+                  top: -30,
+                  right: -30,
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.08),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 20,
+                  right: -15,
+                  child: Container(
+                    width: 55,
+                    height: 55,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.07),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 70,
+                  left: -20,
+                  child: Container(
+                    width: 75,
+                    height: 75,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.06),
+                      shape: BoxShape.circle,
+                    ),
                   ),
                 ),
 
-                // ── BIG Animal character — center stage ──
+                // Sparkle dots
+                Positioned(top: 12, right: 14, child: _Sparkle(color: Colors.white.withOpacity(0.70), size: 7)),
+                Positioned(top: 30, right: 36, child: _Sparkle(color: Colors.white.withOpacity(0.40), size: 5)),
+                Positioned(top: 8, left: 16, child: _Sparkle(color: Colors.white.withOpacity(0.35), size: 4)),
+
+                // Tag badge (top-left)
                 Positioned(
-                  top: 0,
+                  top: 10,
+                  left: 10,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.22),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.white.withOpacity(0.35), width: 1),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(widget.data.tagEmoji, style: const TextStyle(fontSize: 10)),
+                        const SizedBox(width: 3),
+                        Text(
+                          widget.data.tagLabel,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Animal with bounce
+                Positioned(
+                  top: 8,
                   left: 0,
                   right: 0,
                   child: AnimatedBuilder(
                     animation: _bounceAnim,
                     builder: (_, child) => Transform.translate(
-                      offset: Offset(0, sin(_bounceAnim.value * pi) * 6),
+                      offset: Offset(0, sin(_bounceAnim.value * pi) * 7),
                       child: child,
                     ),
                     child: Center(
                       child: CustomPaint(
-                        size: const Size(110, 110),
+                        size: const Size(108, 108),
                         painter: _painterFor(widget.data.animal),
                       ),
                     ),
                   ),
                 ),
 
-                // Shadow under animal for grounded feel
+                // Shadow under animal (squish effect)
                 Positioned(
-                  top: 102,
+                  top: 106,
                   left: 0,
                   right: 0,
                   child: Center(
                     child: AnimatedBuilder(
                       animation: _bounceAnim,
                       builder: (_, __) {
-                        final scale = 0.7 + sin(_bounceAnim.value * pi) * 0.15;
+                        final progress = sin(_bounceAnim.value * pi);
+                        final scaleX = 0.65 + progress * 0.20;
+                        final opacity = 0.18 + progress * 0.08;
                         return Transform.scale(
-                          scaleX: scale,
+                          scaleX: scaleX,
                           scaleY: 1.0,
                           child: Container(
-                            width: 60,
-                            height: 10,
+                            width: 56,
+                            height: 9,
                             decoration: BoxDecoration(
-                              color: widget.data.shadowColor.withOpacity(0.28),
+                              color: Colors.black.withOpacity(opacity),
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
@@ -458,54 +607,62 @@ class _ModeCardState extends State<_ModeCard> with TickerProviderStateMixin {
                   ),
                 ),
 
-                // Text content at bottom
+                // Bottom info panel
                 Positioned(
-                  left: 0, right: 0, bottom: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
                   child: Container(
-                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                    padding: const EdgeInsets.fromLTRB(13, 12, 13, 13),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.14),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withOpacity(0.0),
+                          Colors.black.withOpacity(0.28),
+                          Colors.black.withOpacity(0.38),
+                        ],
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        // Mode number + title
                         Row(
                           children: [
-                            // Mode number badge
                             Container(
-                              width: 24,
-                              height: 24,
+                              width: 22,
+                              height: 22,
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.30),
+                                color: Colors.white.withOpacity(0.25),
                                 shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.55),
-                                  width: 1.5,
-                                ),
+                                border: Border.all(color: Colors.white.withOpacity(0.60), width: 1.5),
                               ),
                               child: Center(
                                 child: Text(
                                   widget.data.id,
                                   style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 11,
-                                  ),
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 10),
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              widget.data.title,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 19,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: -0.3,
-                                shadows: [
-                                  Shadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 4),
-                                ],
+                            const SizedBox(width: 7),
+                            Expanded(
+                              child: Text(
+                                widget.data.title,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: -0.4,
+                                  shadows: [
+                                    Shadow(color: Colors.black38, offset: Offset(0, 1), blurRadius: 4)
+                                  ],
+                                ),
                               ),
                             ),
                           ],
@@ -514,33 +671,30 @@ class _ModeCardState extends State<_ModeCard> with TickerProviderStateMixin {
                         Text(
                           widget.data.desc,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.88),
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w600,
-                          ),
+                              color: Colors.white.withOpacity(0.85),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600),
                         ),
-                        const SizedBox(height: 8),
-                        // Play pill
+                        const SizedBox(height: 9),
+                        // CTA button
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.28),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.white.withOpacity(0.45)),
+                            color: Colors.white.withOpacity(0.24),
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(color: Colors.white.withOpacity(0.50), width: 1),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: const [
-                              Icon(Icons.play_arrow_rounded, color: Colors.white, size: 14),
+                              Icon(Icons.play_arrow_rounded, color: Colors.white, size: 13),
                               SizedBox(width: 4),
-                              Text(
-                                'Tap to use',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
+                              Text('Tap to use',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 0.1)),
                             ],
                           ),
                         ),
@@ -557,10 +711,23 @@ class _ModeCardState extends State<_ModeCard> with TickerProviderStateMixin {
   }
 }
 
-// ═══════════════════════════════════════════════════════════
-//  Bottom Nav Bar
-// ═══════════════════════════════════════════════════════════
+// ─── Sparkle widget ───────────────────────────────────────
+class _Sparkle extends StatelessWidget {
+  final Color color;
+  final double size;
+  const _Sparkle({required this.color, required this.size});
 
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    );
+  }
+}
+
+// ─── Bottom Nav ───────────────────────────────────────────
 class _BottomBar extends StatelessWidget {
   final BuildContext screenContext;
   const _BottomBar({required this.screenContext});
@@ -570,31 +737,51 @@ class _BottomBar extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 6),
         decoration: BoxDecoration(
-          color: const Color(0xFF2D2D2D),
-          borderRadius: BorderRadius.circular(28),
+          color: const Color(0xFF252525),
+          borderRadius: BorderRadius.circular(26),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.18),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
+                color: Colors.black.withOpacity(0.22),
+                blurRadius: 22,
+                offset: const Offset(0, 8)),
           ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _NavItem(emoji: '🏠', label: 'Home',
+            _NavItem(
+                emoji: '🏠',
+                label: 'Home',
                 onTap: () => Navigator.pushNamedAndRemoveUntil(
                     screenContext, AppRoutes.home, (r) => false)),
-            _NavItem(emoji: '🎵', label: 'Records',
-                onTap: () => Navigator.pushNamed(screenContext, AppRoutes.recordings)),
-            _NavItem(emoji: '⚙️', label: 'Options',
-                onTap: () => Navigator.pushNamed(screenContext, AppRoutes.settings)),
+            _NavDivider(),
+            _NavItem(
+                emoji: '🎵',
+                label: 'Records',
+                onTap: () => Navigator.pushNamed(
+                    screenContext, AppRoutes.recordings)),
+            _NavDivider(),
+            _NavItem(
+                emoji: '⚙️',
+                label: 'Options',
+                onTap: () =>
+                    Navigator.pushNamed(screenContext, AppRoutes.settings)),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _NavDivider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 1,
+      height: 28,
+      color: Colors.white.withOpacity(0.10),
     );
   }
 }
@@ -603,7 +790,6 @@ class _NavItem extends StatefulWidget {
   final String emoji;
   final String label;
   final VoidCallback onTap;
-
   const _NavItem({required this.emoji, required this.label, required this.onTap});
 
   @override
@@ -617,28 +803,35 @@ class _NavItemState extends State<_NavItem> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) { setState(() => _pressed = false); widget.onTap(); },
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
       onTapCancel: () => setState(() => _pressed = false),
       child: AnimatedScale(
-        scale: _pressed ? 0.88 : 1.0,
+        scale: _pressed ? 0.85 : 1.0,
         duration: const Duration(milliseconds: 100),
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 100),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 7),
           decoration: BoxDecoration(
-            color: _pressed ? Colors.white.withOpacity(0.12) : Colors.transparent,
+            color: _pressed
+                ? Colors.white.withOpacity(0.14)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(18),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(widget.emoji, style: const TextStyle(fontSize: 20)),
+              Text(widget.emoji, style: const TextStyle(fontSize: 21)),
               const SizedBox(height: 3),
-              Text(widget.label,
-                  style: TextStyle(
+              Text(
+                widget.label,
+                style: TextStyle(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white.withOpacity(0.85),
-                  )),
+                    color: Colors.white.withOpacity(0.82)),
+              ),
             ],
           ),
         ),
@@ -647,293 +840,27 @@ class _NavItemState extends State<_NavItem> {
   }
 }
 
-// ═══════════════════════════════════════════════════════════
-//  Animal Painters  (all drawn with CustomPainter)
-// ═══════════════════════════════════════════════════════════
-
-// ── Bear ─────────────────────────────────────────────────────────────────────
-class _BearPainter extends CustomPainter {
-  final Color color;
-  const _BearPainter({required this.color});
-
+// ─── Dot grid background painter ─────────────────────────
+class _DotGridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final p     = Paint()..color = color..style = PaintingStyle.fill;
-    final dark  = Paint()..color = color.withOpacity(0.55);
-    final white = Paint()..color = Colors.white.withOpacity(0.92);
-    final black = Paint()..color = const Color(0xFF1A1A1A);
-    final cx = size.width / 2;
-    final cy = size.height / 2;
-    final r  = size.width * 0.34;
-
-    // Ears
-    canvas.drawCircle(Offset(cx - r * 0.68, cy - r * 0.74), r * 0.36, p);
-    canvas.drawCircle(Offset(cx + r * 0.68, cy - r * 0.74), r * 0.36, p);
-    canvas.drawCircle(Offset(cx - r * 0.68, cy - r * 0.74), r * 0.20, dark);
-    canvas.drawCircle(Offset(cx + r * 0.68, cy - r * 0.74), r * 0.20, dark);
-    // Head
-    canvas.drawCircle(Offset(cx, cy), r, p);
-    // Muzzle
-    canvas.drawOval(
-      Rect.fromCenter(center: Offset(cx, cy + r * 0.34), width: r * 0.96, height: r * 0.60),
-      dark,
-    );
-    // Eyes
-    canvas.drawCircle(Offset(cx - r * 0.34, cy - r * 0.14), r * 0.15, white);
-    canvas.drawCircle(Offset(cx + r * 0.34, cy - r * 0.14), r * 0.15, white);
-    canvas.drawCircle(Offset(cx - r * 0.32, cy - r * 0.12), r * 0.09, black);
-    canvas.drawCircle(Offset(cx + r * 0.32, cy - r * 0.12), r * 0.09, black);
-    // Eye shine
-    canvas.drawCircle(Offset(cx - r * 0.27, cy - r * 0.17), r * 0.04, white);
-    canvas.drawCircle(Offset(cx + r * 0.37, cy - r * 0.17), r * 0.04, white);
-    // Nose
-    canvas.drawCircle(Offset(cx, cy + r * 0.18), r * 0.11, black);
-    // Smile
-    final smile = Path()
-      ..moveTo(cx - r * 0.22, cy + r * 0.30)
-      ..quadraticBezierTo(cx, cy + r * 0.52, cx + r * 0.22, cy + r * 0.30);
-    canvas.drawPath(smile, Paint()
-      ..color = const Color(0xFF1A1A1A)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width * 0.040
-      ..strokeCap = StrokeCap.round);
-    // Cheek blush
-    canvas.drawCircle(Offset(cx - r * 0.58, cy + r * 0.16), r * 0.16,
-        Paint()..color = Colors.pink.withOpacity(0.38));
-    canvas.drawCircle(Offset(cx + r * 0.58, cy + r * 0.16), r * 0.16,
-        Paint()..color = Colors.pink.withOpacity(0.38));
-  }
-
-  @override
-  bool shouldRepaint(covariant _BearPainter old) => old.color != color;
-}
-
-// ── Duck ─────────────────────────────────────────────────────────────────────
-class _DuckPainter extends CustomPainter {
-  final Color color;
-  const _DuckPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final p      = Paint()..color = color..style = PaintingStyle.fill;
-    final white  = Paint()..color = Colors.white.withOpacity(0.92);
-    final black  = Paint()..color = const Color(0xFF1A1A1A);
-    final orange = Paint()..color = const Color(0xFFFF8C00);
-    final cx = size.width / 2;
-    final cy = size.height / 2;
-    final r  = size.width * 0.30;
-
-    // Body
-    canvas.drawOval(
-      Rect.fromCenter(center: Offset(cx, cy + r * 0.55), width: r * 1.6, height: r * 1.2),
-      p,
-    );
-    // Wing highlight
-    canvas.drawOval(
-      Rect.fromCenter(center: Offset(cx + r * 0.28, cy + r * 0.72), width: r * 0.9, height: r * 0.55),
-      Paint()..color = color.withOpacity(0.50),
-    );
-    // Head
-    canvas.drawCircle(Offset(cx, cy - r * 0.08), r, p);
-    // Head feather tuft
-    final tuft = Path()
-      ..moveTo(cx - r * 0.10, cy - r * 0.94)
-      ..quadraticBezierTo(cx + r * 0.04, cy - r * 1.45, cx + r * 0.18, cy - r * 0.96)
-      ..close();
-    canvas.drawPath(tuft, p);
-    // Beak
-    final beak = Path()
-      ..moveTo(cx + r * 0.80, cy - r * 0.06)
-      ..lineTo(cx + r * 1.25, cy + r * 0.06)
-      ..lineTo(cx + r * 0.80, cy + r * 0.20)
-      ..close();
-    canvas.drawPath(beak, orange);
-    // Eye
-    canvas.drawCircle(Offset(cx + r * 0.30, cy - r * 0.20), r * 0.16, white);
-    canvas.drawCircle(Offset(cx + r * 0.32, cy - r * 0.18), r * 0.09, black);
-    canvas.drawCircle(Offset(cx + r * 0.37, cy - r * 0.22), r * 0.04, white);
-    // Blush
-    canvas.drawCircle(Offset(cx + r * 0.52, cy + r * 0.10), r * 0.14,
-        Paint()..color = Colors.pink.withOpacity(0.40));
-  }
-
-  @override
-  bool shouldRepaint(covariant _DuckPainter old) => old.color != color;
-}
-
-// ── Cat ──────────────────────────────────────────────────────────────────────
-class _CatPainter extends CustomPainter {
-  final Color color;
-  const _CatPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final p     = Paint()..color = color..style = PaintingStyle.fill;
-    final white = Paint()..color = Colors.white.withOpacity(0.92);
-    final black = Paint()..color = const Color(0xFF1A1A1A);
-    final pink  = Paint()..color = const Color(0xFFFFB3C6);
-    final cx = size.width / 2;
-    final cy = size.height / 2;
-    final r  = size.width * 0.30;
-
-    // Ears
-    final lEar = Path()
-      ..moveTo(cx - r * 0.60, cy - r * 0.60)
-      ..lineTo(cx - r * 1.00, cy - r * 1.22)
-      ..lineTo(cx - r * 0.16, cy - r * 0.94)
-      ..close();
-    final rEar = Path()
-      ..moveTo(cx + r * 0.60, cy - r * 0.60)
-      ..lineTo(cx + r * 1.00, cy - r * 1.22)
-      ..lineTo(cx + r * 0.16, cy - r * 0.94)
-      ..close();
-    canvas.drawPath(lEar, p);
-    canvas.drawPath(rEar, p);
-    // Inner ear
-    final liEar = Path()
-      ..moveTo(cx - r * 0.60, cy - r * 0.70)
-      ..lineTo(cx - r * 0.86, cy - r * 1.10)
-      ..lineTo(cx - r * 0.28, cy - r * 0.92)
-      ..close();
-    final riEar = Path()
-      ..moveTo(cx + r * 0.60, cy - r * 0.70)
-      ..lineTo(cx + r * 0.86, cy - r * 1.10)
-      ..lineTo(cx + r * 0.28, cy - r * 0.92)
-      ..close();
-    canvas.drawPath(liEar, pink);
-    canvas.drawPath(riEar, pink);
-    // Head
-    canvas.drawCircle(Offset(cx, cy), r, p);
-    // Eyes (oval cat eyes)
-    canvas.drawOval(Rect.fromCenter(center: Offset(cx - r * 0.35, cy - r * 0.10), width: r * 0.34, height: r * 0.28), white);
-    canvas.drawOval(Rect.fromCenter(center: Offset(cx + r * 0.35, cy - r * 0.10), width: r * 0.34, height: r * 0.28), white);
-    canvas.drawOval(Rect.fromCenter(center: Offset(cx - r * 0.35, cy - r * 0.10), width: r * 0.11, height: r * 0.24), black);
-    canvas.drawOval(Rect.fromCenter(center: Offset(cx + r * 0.35, cy - r * 0.10), width: r * 0.11, height: r * 0.24), black);
-    canvas.drawCircle(Offset(cx - r * 0.28, cy - r * 0.16), r * 0.05, white);
-    canvas.drawCircle(Offset(cx + r * 0.42, cy - r * 0.16), r * 0.05, white);
-    // Nose
-    final nose = Path()
-      ..moveTo(cx, cy + r * 0.10)
-      ..lineTo(cx - r * 0.11, cy + r * 0.22)
-      ..lineTo(cx + r * 0.11, cy + r * 0.22)
-      ..close();
-    canvas.drawPath(nose, pink);
-    // Whiskers
-    final wPaint = Paint()
-      ..color = white.color
-      ..strokeWidth = size.width * 0.028
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
-    for (final d in [-1.0, 1.0]) {
-      canvas.drawLine(Offset(cx + d * r * 0.14, cy + r * 0.22), Offset(cx + d * r * 0.90, cy + r * 0.10), wPaint);
-      canvas.drawLine(Offset(cx + d * r * 0.14, cy + r * 0.30), Offset(cx + d * r * 0.90, cy + r * 0.38), wPaint);
+    final paint = Paint()
+      ..color = const Color(0xFF000000).withOpacity(0.032)
+      ..style = PaintingStyle.fill;
+    const spacing = 24.0;
+    const radius = 1.5;
+    for (double x = spacing; x < size.width; x += spacing) {
+      for (double y = spacing; y < size.height; y += spacing) {
+        canvas.drawCircle(Offset(x, y), radius, paint);
+      }
     }
-    // Smile
-    final smile = Path()
-      ..moveTo(cx - r * 0.16, cy + r * 0.28)
-      ..quadraticBezierTo(cx, cy + r * 0.46, cx + r * 0.16, cy + r * 0.28);
-    canvas.drawPath(smile, Paint()
-      ..color = const Color(0xFF1A1A1A)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width * 0.038
-      ..strokeCap = StrokeCap.round);
-    // Blush
-    canvas.drawCircle(Offset(cx - r * 0.58, cy + r * 0.18), r * 0.16, Paint()..color = Colors.pink.withOpacity(0.35));
-    canvas.drawCircle(Offset(cx + r * 0.58, cy + r * 0.18), r * 0.16, Paint()..color = Colors.pink.withOpacity(0.35));
-  }
-
-  @override
-  bool shouldRepaint(covariant _CatPainter old) => old.color != color;
-}
-
-// ── Bunny ────────────────────────────────────────────────────────────────────
-class _BunnyPainter extends CustomPainter {
-  final Color color;
-  const _BunnyPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final p     = Paint()..color = color..style = PaintingStyle.fill;
-    final white = Paint()..color = Colors.white.withOpacity(0.92);
-    final black = Paint()..color = const Color(0xFF1A1A1A);
-    final pink  = Paint()..color = const Color(0xFFFFB3C6);
-    final cx = size.width / 2;
-    final cy = size.height / 2;
-    final r  = size.width * 0.30;
-
-    // Long ears
-    canvas.drawRRect(RRect.fromRectAndRadius(
-      Rect.fromCenter(center: Offset(cx - r * 0.40, cy - r * 1.28), width: r * 0.46, height: r * 1.08),
-      const Radius.circular(30)), p);
-    canvas.drawRRect(RRect.fromRectAndRadius(
-      Rect.fromCenter(center: Offset(cx + r * 0.40, cy - r * 1.28), width: r * 0.46, height: r * 1.08),
-      const Radius.circular(30)), p);
-    // Inner ear
-    canvas.drawRRect(RRect.fromRectAndRadius(
-      Rect.fromCenter(center: Offset(cx - r * 0.40, cy - r * 1.28), width: r * 0.22, height: r * 0.76),
-      const Radius.circular(20)), pink);
-    canvas.drawRRect(RRect.fromRectAndRadius(
-      Rect.fromCenter(center: Offset(cx + r * 0.40, cy - r * 1.28), width: r * 0.22, height: r * 0.76),
-      const Radius.circular(20)), pink);
-    // Head
-    canvas.drawCircle(Offset(cx, cy), r, p);
-    // Cheeks
-    canvas.drawCircle(Offset(cx - r * 0.52, cy + r * 0.20), r * 0.22, Paint()..color = Colors.pink.withOpacity(0.38));
-    canvas.drawCircle(Offset(cx + r * 0.52, cy + r * 0.20), r * 0.22, Paint()..color = Colors.pink.withOpacity(0.38));
-    // Eyes
-    canvas.drawCircle(Offset(cx - r * 0.32, cy - r * 0.10), r * 0.15, white);
-    canvas.drawCircle(Offset(cx + r * 0.32, cy - r * 0.10), r * 0.15, white);
-    canvas.drawCircle(Offset(cx - r * 0.30, cy - r * 0.08), r * 0.09, black);
-    canvas.drawCircle(Offset(cx + r * 0.30, cy - r * 0.08), r * 0.09, black);
-    canvas.drawCircle(Offset(cx - r * 0.24, cy - r * 0.14), r * 0.04, white);
-    canvas.drawCircle(Offset(cx + r * 0.36, cy - r * 0.14), r * 0.04, white);
-    // Nose
-    canvas.drawCircle(Offset(cx, cy + r * 0.17), r * 0.11, pink);
-    // Smile
-    final smile = Path()
-      ..moveTo(cx - r * 0.22, cy + r * 0.32)
-      ..quadraticBezierTo(cx, cy + r * 0.52, cx + r * 0.22, cy + r * 0.32);
-    canvas.drawPath(smile, Paint()
-      ..color = const Color(0xFF1A1A1A)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width * 0.040
-      ..strokeCap = StrokeCap.round);
-    // Little tail hint (optional bottom)
-    canvas.drawCircle(Offset(cx + r * 0.80, cy + r * 0.68), r * 0.18, white);
-  }
-
-  @override
-  bool shouldRepaint(covariant _BunnyPainter old) => old.color != color;
-}
-
-// ═══════════════════════════════════════════════════════════
-//  Wave Painter
-// ═══════════════════════════════════════════════════════════
-
-class _WavePainter extends CustomPainter {
-  final Color color;
-  const _WavePainter(this.color);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final path = Path()
-      ..moveTo(0, 0)
-      ..lineTo(size.width, 0)
-      ..lineTo(size.width, 28)
-      ..quadraticBezierTo(size.width * 0.75, 52, size.width * 0.5, 38)
-      ..quadraticBezierTo(size.width * 0.25, 22, 0, 48)
-      ..close();
-    canvas.drawPath(path, Paint()..color = color);
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter _) => false;
 }
 
-// ═══════════════════════════════════════════════════════════
-//  Data & Helpers
-// ═══════════════════════════════════════════════════════════
-
+// ─── Data ─────────────────────────────────────────────────
 enum _Animal { bear, duck, cat, bunny }
 
 class _ModeData {
@@ -946,6 +873,8 @@ class _ModeData {
   final Color shadowColor;
   final String bgImage;
   final double overlay;
+  final String tagEmoji;
+  final String tagLabel;
 
   const _ModeData({
     required this.id,
@@ -957,6 +886,8 @@ class _ModeData {
     required this.shadowColor,
     required this.bgImage,
     required this.overlay,
+    required this.tagEmoji,
+    required this.tagLabel,
   });
 }
 
@@ -971,4 +902,321 @@ class _Blob extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(color: color, shape: BoxShape.circle),
       );
+}
+
+// ═══════════════════════════════════════════════════════════
+//  Animal Painters — all fully detailed
+// ═══════════════════════════════════════════════════════════
+
+class _BearPainter extends CustomPainter {
+  final Color color;
+  const _BearPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()..color = color..style = PaintingStyle.fill;
+    final dark = Paint()..color = color.withOpacity(0.50);
+    final white = Paint()..color = Colors.white.withOpacity(0.92);
+    final black = Paint()..color = const Color(0xFF1A1A1A);
+    final nose = Paint()..color = const Color(0xFF3A1A1A);
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r = size.width * 0.34;
+
+    // Ears
+    canvas.drawCircle(Offset(cx - r * 0.68, cy - r * 0.74), r * 0.36, p);
+    canvas.drawCircle(Offset(cx + r * 0.68, cy - r * 0.74), r * 0.36, p);
+    canvas.drawCircle(Offset(cx - r * 0.68, cy - r * 0.74), r * 0.20, dark);
+    canvas.drawCircle(Offset(cx + r * 0.68, cy - r * 0.74), r * 0.20, dark);
+
+    // Head
+    canvas.drawCircle(Offset(cx, cy), r, p);
+
+    // Muzzle
+    canvas.drawOval(
+        Rect.fromCenter(center: Offset(cx, cy + r * 0.34), width: r * 0.96, height: r * 0.60),
+        dark);
+
+    // Eyes (white + pupil + shine)
+    canvas.drawCircle(Offset(cx - r * 0.34, cy - r * 0.14), r * 0.16, white);
+    canvas.drawCircle(Offset(cx + r * 0.34, cy - r * 0.14), r * 0.16, white);
+    canvas.drawCircle(Offset(cx - r * 0.32, cy - r * 0.12), r * 0.095, black);
+    canvas.drawCircle(Offset(cx + r * 0.32, cy - r * 0.12), r * 0.095, black);
+    // Eye shine
+    canvas.drawCircle(Offset(cx - r * 0.26, cy - r * 0.20), r * 0.040, white);
+    canvas.drawCircle(Offset(cx + r * 0.38, cy - r * 0.20), r * 0.040, white);
+
+    // Nose
+    final nosePath = Path()
+      ..moveTo(cx, cy + r * 0.20)
+      ..lineTo(cx - r * 0.12, cy + r * 0.06)
+      ..lineTo(cx + r * 0.12, cy + r * 0.06)
+      ..close();
+    canvas.drawPath(nosePath, nose);
+
+    // Smile
+    final smilePaint = Paint()
+      ..color = nose.color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = r * 0.07
+      ..strokeCap = StrokeCap.round;
+    final smilePath = Path()
+      ..moveTo(cx - r * 0.18, cy + r * 0.26)
+      ..quadraticBezierTo(cx, cy + r * 0.40, cx + r * 0.18, cy + r * 0.26);
+    canvas.drawPath(smilePath, smilePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _BearPainter old) => old.color != color;
+}
+
+class _DuckPainter extends CustomPainter {
+  final Color color;
+  const _DuckPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()..color = color..style = PaintingStyle.fill;
+    final white = Paint()..color = Colors.white.withOpacity(0.92);
+    final black = Paint()..color = const Color(0xFF1A1A1A);
+    final orange = Paint()..color = const Color(0xFFFF8C00);
+    final darkOrange = Paint()..color = const Color(0xFFCC6600);
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r = size.width * 0.30;
+
+    // Body
+    canvas.drawOval(
+        Rect.fromCenter(center: Offset(cx, cy + r * 0.55), width: r * 1.6, height: r * 1.2), p);
+
+    // Head
+    canvas.drawCircle(Offset(cx, cy - r * 0.08), r, p);
+
+    // Wing highlight
+    final wingPaint = Paint()..color = color.withOpacity(0.60);
+    canvas.drawOval(
+        Rect.fromCenter(center: Offset(cx - r * 0.20, cy + r * 0.70), width: r * 0.70, height: r * 0.38),
+        wingPaint);
+
+    // Beak (upper + lower)
+    final upperBeak = Path()
+      ..moveTo(cx + r * 0.82, cy - r * 0.08)
+      ..lineTo(cx + r * 1.28, cy)
+      ..lineTo(cx + r * 0.82, cy + r * 0.12)
+      ..close();
+    canvas.drawPath(upperBeak, orange);
+
+    final lowerBeak = Path()
+      ..moveTo(cx + r * 0.82, cy + r * 0.10)
+      ..lineTo(cx + r * 1.20, cy + r * 0.16)
+      ..lineTo(cx + r * 0.82, cy + r * 0.24)
+      ..close();
+    canvas.drawPath(lowerBeak, darkOrange);
+
+    // Eye white + pupil + shine
+    canvas.drawCircle(Offset(cx + r * 0.30, cy - r * 0.22), r * 0.17, white);
+    canvas.drawCircle(Offset(cx + r * 0.32, cy - r * 0.20), r * 0.10, black);
+    canvas.drawCircle(Offset(cx + r * 0.26, cy - r * 0.26), r * 0.040, white);
+
+    // Cheek blush
+    final blush = Paint()..color = Colors.pink.withOpacity(0.30);
+    canvas.drawCircle(Offset(cx + r * 0.06, cy + r * 0.06), r * 0.16, blush);
+  }
+
+  @override
+  bool shouldRepaint(covariant _DuckPainter old) => old.color != color;
+}
+
+class _CatPainter extends CustomPainter {
+  final Color color;
+  const _CatPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()..color = color..style = PaintingStyle.fill;
+    final dark = Paint()..color = color.withOpacity(0.55);
+    final white = Paint()..color = Colors.white.withOpacity(0.92);
+    final black = Paint()..color = const Color(0xFF1A1A1A);
+    final pink = Paint()..color = const Color(0xFFFFB3C6);
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r = size.width * 0.32;
+
+    // Ears (triangles)
+    final leftEar = Path()
+      ..moveTo(cx - r * 0.80, cy - r * 0.50)
+      ..lineTo(cx - r * 0.38, cy - r * 1.05)
+      ..lineTo(cx - r * 0.10, cy - r * 0.68)
+      ..close();
+    canvas.drawPath(leftEar, p);
+
+    final rightEar = Path()
+      ..moveTo(cx + r * 0.80, cy - r * 0.50)
+      ..lineTo(cx + r * 0.38, cy - r * 1.05)
+      ..lineTo(cx + r * 0.10, cy - r * 0.68)
+      ..close();
+    canvas.drawPath(rightEar, p);
+
+    // Inner ears (pink)
+    final leftInner = Path()
+      ..moveTo(cx - r * 0.70, cy - r * 0.55)
+      ..lineTo(cx - r * 0.38, cy - r * 0.94)
+      ..lineTo(cx - r * 0.14, cy - r * 0.66)
+      ..close();
+    canvas.drawPath(leftInner, pink);
+
+    final rightInner = Path()
+      ..moveTo(cx + r * 0.70, cy - r * 0.55)
+      ..lineTo(cx + r * 0.38, cy - r * 0.94)
+      ..lineTo(cx + r * 0.14, cy - r * 0.66)
+      ..close();
+    canvas.drawPath(rightInner, pink);
+
+    // Head
+    canvas.drawCircle(Offset(cx, cy), r, p);
+
+    // Muzzle
+    canvas.drawOval(
+        Rect.fromCenter(center: Offset(cx, cy + r * 0.30), width: r * 0.80, height: r * 0.48),
+        dark);
+
+    // Eyes (cat-like, slightly oval)
+    canvas.drawOval(
+        Rect.fromCenter(center: Offset(cx - r * 0.34, cy - r * 0.14), width: r * 0.32, height: r * 0.26),
+        white);
+    canvas.drawOval(
+        Rect.fromCenter(center: Offset(cx + r * 0.34, cy - r * 0.14), width: r * 0.32, height: r * 0.26),
+        white);
+
+    // Pupils (vertical slits)
+    canvas.drawOval(
+        Rect.fromCenter(center: Offset(cx - r * 0.34, cy - r * 0.14), width: r * 0.10, height: r * 0.22),
+        black);
+    canvas.drawOval(
+        Rect.fromCenter(center: Offset(cx + r * 0.34, cy - r * 0.14), width: r * 0.10, height: r * 0.22),
+        black);
+
+    // Eye shine
+    canvas.drawCircle(Offset(cx - r * 0.28, cy - r * 0.20), r * 0.040, white);
+    canvas.drawCircle(Offset(cx + r * 0.40, cy - r * 0.20), r * 0.040, white);
+
+    // Nose (small triangle)
+    final nosePath = Path()
+      ..moveTo(cx, cy + r * 0.16)
+      ..lineTo(cx - r * 0.09, cy + r * 0.06)
+      ..lineTo(cx + r * 0.09, cy + r * 0.06)
+      ..close();
+    canvas.drawPath(nosePath, pink);
+
+    // Whiskers
+    final whiskerPaint = Paint()
+      ..color = Colors.white.withOpacity(0.75)
+      ..strokeWidth = r * 0.045
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+
+    // Left whiskers
+    canvas.drawLine(Offset(cx - r * 0.24, cy + r * 0.18), Offset(cx - r * 0.82, cy + r * 0.10), whiskerPaint);
+    canvas.drawLine(Offset(cx - r * 0.24, cy + r * 0.22), Offset(cx - r * 0.82, cy + r * 0.28), whiskerPaint);
+    // Right whiskers
+    canvas.drawLine(Offset(cx + r * 0.24, cy + r * 0.18), Offset(cx + r * 0.82, cy + r * 0.10), whiskerPaint);
+    canvas.drawLine(Offset(cx + r * 0.24, cy + r * 0.22), Offset(cx + r * 0.82, cy + r * 0.28), whiskerPaint);
+
+    // Smile
+    final smilePaint = Paint()
+      ..color = const Color(0xFF3A1A1A)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = r * 0.07
+      ..strokeCap = StrokeCap.round;
+    final smilePath = Path()
+      ..moveTo(cx - r * 0.14, cy + r * 0.28)
+      ..quadraticBezierTo(cx, cy + r * 0.40, cx + r * 0.14, cy + r * 0.28);
+    canvas.drawPath(smilePath, smilePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _CatPainter old) => old.color != color;
+}
+
+class _BunnyPainter extends CustomPainter {
+  final Color color;
+  const _BunnyPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()..color = color..style = PaintingStyle.fill;
+    final white = Paint()..color = Colors.white.withOpacity(0.92);
+    final black = Paint()..color = const Color(0xFF1A1A1A);
+    final pink = Paint()..color = const Color(0xFFFFB3C6);
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final r = size.width * 0.30;
+
+    // Long ears
+    final leftEarOuter = RRect.fromRectAndRadius(
+        Rect.fromCenter(center: Offset(cx - r * 0.44, cy - r * 1.10), width: r * 0.44, height: r * 1.0),
+        Radius.circular(r * 0.22));
+    canvas.drawRRect(leftEarOuter, p);
+
+    final rightEarOuter = RRect.fromRectAndRadius(
+        Rect.fromCenter(center: Offset(cx + r * 0.44, cy - r * 1.10), width: r * 0.44, height: r * 1.0),
+        Radius.circular(r * 0.22));
+    canvas.drawRRect(rightEarOuter, p);
+
+    // Inner ear (pink)
+    final leftEarInner = RRect.fromRectAndRadius(
+        Rect.fromCenter(center: Offset(cx - r * 0.44, cy - r * 1.10), width: r * 0.22, height: r * 0.70),
+        Radius.circular(r * 0.11));
+    canvas.drawRRect(leftEarInner, pink);
+
+    final rightEarInner = RRect.fromRectAndRadius(
+        Rect.fromCenter(center: Offset(cx + r * 0.44, cy - r * 1.10), width: r * 0.22, height: r * 0.70),
+        Radius.circular(r * 0.11));
+    canvas.drawRRect(rightEarInner, pink);
+
+    // Head
+    canvas.drawCircle(Offset(cx, cy), r, p);
+
+    // Chubby cheeks
+    final blush = Paint()..color = Colors.pink.withOpacity(0.28);
+    canvas.drawCircle(Offset(cx - r * 0.44, cy + r * 0.18), r * 0.20, blush);
+    canvas.drawCircle(Offset(cx + r * 0.44, cy + r * 0.18), r * 0.20, blush);
+
+    // Eyes (big round)
+    canvas.drawCircle(Offset(cx - r * 0.32, cy - r * 0.12), r * 0.18, white);
+    canvas.drawCircle(Offset(cx + r * 0.32, cy - r * 0.12), r * 0.18, white);
+    canvas.drawCircle(Offset(cx - r * 0.30, cy - r * 0.10), r * 0.11, black);
+    canvas.drawCircle(Offset(cx + r * 0.30, cy - r * 0.10), r * 0.11, black);
+    // Shine
+    canvas.drawCircle(Offset(cx - r * 0.24, cy - r * 0.16), r * 0.04, white);
+    canvas.drawCircle(Offset(cx + r * 0.36, cy - r * 0.16), r * 0.04, white);
+
+    // Nose (pink circle)
+    canvas.drawCircle(Offset(cx, cy + r * 0.10), r * 0.085, pink);
+
+    // Smile
+    final smilePaint = Paint()
+      ..color = const Color(0xFF3A1A1A)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = r * 0.07
+      ..strokeCap = StrokeCap.round;
+    final smilePath = Path()
+      ..moveTo(cx - r * 0.16, cy + r * 0.25)
+      ..quadraticBezierTo(cx, cy + r * 0.38, cx + r * 0.16, cy + r * 0.25);
+    canvas.drawPath(smilePath, smilePaint);
+
+    // Little teeth
+    final teethPaint = Paint()..color = Colors.white..style = PaintingStyle.fill;
+    final leftTooth = RRect.fromRectAndRadius(
+        Rect.fromLTWH(cx - r * 0.12, cy + r * 0.21, r * 0.11, r * 0.12),
+        Radius.circular(r * 0.03));
+    canvas.drawRRect(leftTooth, teethPaint);
+    final rightTooth = RRect.fromRectAndRadius(
+        Rect.fromLTWH(cx + r * 0.01, cy + r * 0.21, r * 0.11, r * 0.12),
+        Radius.circular(r * 0.03));
+    canvas.drawRRect(rightTooth, teethPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _BunnyPainter old) => old.color != color;
 }

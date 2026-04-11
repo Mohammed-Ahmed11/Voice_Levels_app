@@ -1,31 +1,35 @@
 class RecordingItem {
   final String id;
+  final String profileId; // ✅ NEW
+  final String modeId;
+  final int level;
   final String filePath;
   final DateTime createdAt;
-  final int level; // 1..N
-  final String modeId; // 1..4
 
   RecordingItem({
     required this.id,
+    required this.profileId,
+    required this.modeId,
+    required this.level,
     required this.filePath,
     required this.createdAt,
-    required this.level,
-    required this.modeId,
   });
 
   Map<String, dynamic> toJson() => {
         'id': id,
+        'profileId': profileId,
+        'modeId': modeId,
+        'level': level,
         'filePath': filePath,
         'createdAt': createdAt.toIso8601String(),
-        'level': level,
-        'modeId': modeId,
       };
 
   factory RecordingItem.fromJson(Map<String, dynamic> json) => RecordingItem(
         id: (json['id'] ?? '').toString(),
+        profileId: (json['profileId'] ?? 'unknown').toString(),
+        modeId: (json['modeId'] ?? '').toString(),
+        level: (json['level'] ?? 0) is int ? json['level'] : int.tryParse('${json['level']}') ?? 0,
         filePath: (json['filePath'] ?? '').toString(),
-        createdAt: DateTime.parse((json['createdAt'] ?? DateTime.now().toIso8601String()).toString()),
-        level: int.tryParse((json['level'] ?? 1).toString()) ?? 1,
-        modeId: (json['modeId'] ?? '1').toString(),
+        createdAt: DateTime.tryParse((json['createdAt'] ?? '').toString()) ?? DateTime.now(),
       );
 }

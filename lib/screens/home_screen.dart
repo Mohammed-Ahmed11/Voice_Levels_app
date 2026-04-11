@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../routes.dart';
+import '../services/local_db.dart';
+import '../models/parent_profile.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _CardData(
       heroTag: 'hero_recordings',
       emoji: '🎵',
-      title: 'Recordings',
+      title: 'Reports',
       subtitle: 'Listen & share!',
       bgColor: Color(0xFF6BCB77),
       accentColor: Color(0xFF8EDA99),
@@ -41,8 +43,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _CardData(
       heroTag: 'hero_profile',
       emoji: '👶',
-      title: 'Profile',
-      subtitle: 'Parent info',
+      title: 'Profiles',
+      subtitle: 'Patients / kids',
       bgColor: Color(0xFF4D96FF),
       accentColor: Color(0xFF7AB3FF),
       shadowColor: Color(0xFF2B72D9),
@@ -84,8 +86,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         .toList();
 
     _cardSlides = _cardControllers
-        .map((c) => Tween<Offset>(begin: const Offset(0, 0.25), end: Offset.zero)
-            .animate(CurvedAnimation(parent: c, curve: Curves.easeOutBack)))
+        .map(
+          (c) => Tween<Offset>(begin: const Offset(0, 0.25), end: Offset.zero)
+              .animate(CurvedAnimation(parent: c, curve: Curves.easeOutBack)),
+        )
         .toList();
 
     for (int i = 0; i < _cardControllers.length; i++) {
@@ -104,6 +108,268 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  Future<String?> _pickProfileId() async {
+    final profiles = LocalDb.getProfiles();
+
+    if (profiles.isEmpty) {
+      // مفيش Profiles: نوديه لصفحة البروفايل
+      if (!mounted) return null;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: const Color(0xFFFF6B6B),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          content: const Text(
+            'Create a profile first 👶',
+            style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
+          ),
+        ),
+      );
+      Navigator.pushNamed(context, AppRoutes.profile);
+      return null;
+    }
+
+    // لو فيه Active Profile جاهز نعرضه أول واحد
+    final activeId = LocalDb.getActiveProfileId();
+    ParentProfile? active =
+        profiles.where((p) => p.id == activeId).isNotEmpty
+            ? profiles.firstWhere((p) => p.id == activeId)
+            : null;
+
+    return showDialog<String>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) {
+        return Dialog(
+          backgroundColor: const Color(0xFFFFF4E8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('👶 Choose Profile',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFF3D3D3D),
+                    )),
+                const SizedBox(height: 6),
+                Text(
+                  'Select who you will record for',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 14),
+
+                // Active hint
+                if (active != null)
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF6BCB77).withOpacity(0.10),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                          color: const Color(0xFF6BCB77).withOpacity(0.25)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Text('⭐', style: TextStyle(fontSize: 14)),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Active: ${active.displayName}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF3D3D3D),
+                              fontSize: 12.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                const SizedBox(height: 10),
+
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 320),
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: profiles.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (_, i) {
+                      final p = profiles[i];
+                      final isActive = p.id == activeId;
+                      return GestureDetector(
+                        onTap: () => Navigator.pop(context, p.id),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: isActive
+                                  ? const Color(0xFF6BCB77)
+                                  : Colors.transparent,
+                              width: 2,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.06),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 38,
+                                height: 38,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF9C8AE6)
+                                      .withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Center(
+                                  child: Text('👶',
+                                      style: TextStyle(fontSize: 18)),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      p.displayName,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w900,
+                                        color: Color(0xFF3D3D3D),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      p.phone.isEmpty ? 'No phone' : p.phone,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey.shade600,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (isActive)
+                                const Text('✅',
+                                    style: TextStyle(fontSize: 16)),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.pushNamed(context, AppRoutes.profile);
+                        },
+                        child: Container(
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF4D96FF),
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0xFF2B72D9),
+                                blurRadius: 0,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: const Center(
+                            child: Text(
+                              '➕ New Profile',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => Navigator.pop(context, null),
+                        child: Container(
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE8E0D5),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                color: Color(0xFF3D3D3D),
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _handleCardTap(_CardData card) async {
+    if (card.route == AppRoutes.modeSelect) {
+      // Start: لازم نختار Profile
+      final profileId = await _pickProfileId();
+      if (profileId == null) return;
+
+      await LocalDb.setActiveProfileId(profileId);
+
+      if (!mounted) return;
+      Navigator.pushNamed(
+        context,
+        AppRoutes.modeSelect,
+        arguments: {'profileId': profileId, 'heroTag': card.heroTag},
+      );
+      return;
+    }
+
+    // باقي الكروت طبيعي
+    Navigator.pushNamed(
+      context,
+      card.route,
+      arguments: {'heroTag': card.heroTag},
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -113,18 +379,30 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       backgroundColor: const Color(0xFFFFF8F0),
       body: Stack(
         children: [
-          // Soft pastel blobs
-          Positioned(top: -60, left: -40, child: _Blob(color: const Color(0xFFFFD6D6), size: 220)),
-          Positioned(top: 80, right: -50, child: _Blob(color: const Color(0xFFD6F0FF), size: 190)),
-          Positioned(bottom: 100, left: -30, child: _Blob(color: const Color(0xFFD6FFE4), size: 200)),
-          Positioned(bottom: -40, right: 20, child: _Blob(color: const Color(0xFFFFEDD6), size: 170)),
+          Positioned(
+              top: -60,
+              left: -40,
+              child: _Blob(color: const Color(0xFFFFD6D6), size: 220)),
+          Positioned(
+              top: 80,
+              right: -50,
+              child: _Blob(color: const Color(0xFFD6F0FF), size: 190)),
+          Positioned(
+              bottom: 100,
+              left: -30,
+              child: _Blob(color: const Color(0xFFD6FFE4), size: 200)),
+          Positioned(
+              bottom: -40,
+              right: 20,
+              child: _Blob(color: const Color(0xFFFFEDD6), size: 170)),
 
-          // Floating dot accents
           const _Dot(top: 160, left: 28, color: Color(0xFFFF6B6B), size: 10),
           const _Dot(top: 220, right: 22, color: Color(0xFF6BCB77), size: 8),
           const _Dot(top: 340, left: 14, color: Color(0xFF4D96FF), size: 12),
-          const _Dot(bottom: 220, left: 18, color: Color(0xFFFF9F1C), size: 9),
-          const _Dot(bottom: 160, right: 16, color: Color(0xFFFF6B6B), size: 7),
+          const _Dot(
+              bottom: 220, left: 18, color: Color(0xFFFF9F1C), size: 9),
+          const _Dot(
+              bottom: 160, right: 16, color: Color(0xFFFF6B6B), size: 7),
 
           SafeArea(
             child: Padding(
@@ -133,7 +411,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 children: [
                   const SizedBox(height: 16),
 
-                  // Floating logo
                   AnimatedBuilder(
                     animation: _floatController,
                     builder: (_, child) => Transform.translate(
@@ -141,7 +418,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       child: child,
                     ),
                     child: SizedBox(
-                      height: 80,
+                      height: 72,
                       child: Image.asset(
                         'assets/images/applogo.png',
                         fit: BoxFit.contain,
@@ -152,7 +429,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
                   const SizedBox(height: 18),
 
-                  // Greeting header
                   RichText(
                     textAlign: TextAlign.center,
                     text: const TextSpan(
@@ -170,7 +446,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w900,
-                            color: Color(0xFF9C8AE6),
+                            color: Color(0xFFFF6B6B),
                           ),
                         ),
                       ],
@@ -189,7 +465,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
                   const SizedBox(height: 24),
 
-                  // Cards grid
                   Expanded(
                     child: GridView.builder(
                       physics: const BouncingScrollPhysics(),
@@ -209,11 +484,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               data: _cards[i],
                               floatController: _floatController,
                               floatPhaseOffset: i * 0.25,
-                              onTap: () => Navigator.pushNamed(
-                                context,
-                                _cards[i].route,
-                                arguments: {'heroTag': _cards[i].heroTag},
-                              ),
+                              onTap: () => _handleCardTap(_cards[i]),
                             ),
                           ),
                         );
@@ -223,9 +494,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
                   const SizedBox(height: 12),
 
-                  // Tip pill
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 18, vertical: 10),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFFD93D),
                       borderRadius: BorderRadius.circular(30),
@@ -265,8 +536,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 }
 
-// ─── Kids Card ────────────────────────────────────────────────────────────────
-
 class _KidsCard extends StatefulWidget {
   final _CardData data;
   final AnimationController floatController;
@@ -284,7 +553,8 @@ class _KidsCard extends StatefulWidget {
   State<_KidsCard> createState() => _KidsCardState();
 }
 
-class _KidsCardState extends State<_KidsCard> with SingleTickerProviderStateMixin {
+class _KidsCardState extends State<_KidsCard>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _pressCtrl;
   late final Animation<double> _scaleAnim;
 
@@ -318,7 +588,8 @@ class _KidsCardState extends State<_KidsCard> with SingleTickerProviderStateMixi
       child: AnimatedBuilder(
         animation: Listenable.merge([_pressCtrl, widget.floatController]),
         builder: (_, child) {
-          final phase = (widget.floatController.value + widget.floatPhaseOffset) % 1.0;
+          final phase =
+              (widget.floatController.value + widget.floatPhaseOffset) % 1.0;
           final dy = sin(phase * pi) * 4;
           return Transform.translate(
             offset: Offset(0, dy),
@@ -332,13 +603,11 @@ class _KidsCardState extends State<_KidsCard> with SingleTickerProviderStateMixi
               color: widget.data.bgColor,
               borderRadius: BorderRadius.circular(28),
               boxShadow: [
-                // Solid cartoon bottom shadow
                 BoxShadow(
                   color: widget.data.shadowColor,
                   blurRadius: 0,
                   offset: const Offset(0, 6),
                 ),
-                // Soft ambient glow
                 BoxShadow(
                   color: widget.data.shadowColor.withOpacity(0.3),
                   blurRadius: 20,
@@ -348,13 +617,13 @@ class _KidsCardState extends State<_KidsCard> with SingleTickerProviderStateMixi
             ),
             child: Stack(
               children: [
-                // Wavy top accent strip
                 Positioned(
                   top: 0,
                   left: 0,
                   right: 0,
                   child: ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(28)),
                     child: CustomPaint(
                       size: const Size(double.infinity, 56),
                       painter: _WavePainter(widget.data.accentColor),
@@ -362,20 +631,17 @@ class _KidsCardState extends State<_KidsCard> with SingleTickerProviderStateMixi
                   ),
                 ),
 
-                // Star sparkles (top right)
                 Positioned(
                   top: 10,
                   right: 12,
                   child: _Sparkle(colors: widget.data.stars),
                 ),
 
-                // Content
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Emoji bubble
                       Container(
                         width: 58,
                         height: 58,
@@ -435,8 +701,6 @@ class _KidsCardState extends State<_KidsCard> with SingleTickerProviderStateMixi
   }
 }
 
-// ─── Wave Painter ─────────────────────────────────────────────────────────────
-
 class _WavePainter extends CustomPainter {
   final Color color;
   const _WavePainter(this.color);
@@ -457,8 +721,6 @@ class _WavePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-
-// ─── Sparkle ──────────────────────────────────────────────────────────────────
 
 class _Sparkle extends StatelessWidget {
   final List<Color> colors;
@@ -482,8 +744,6 @@ class _Sparkle extends StatelessWidget {
     );
   }
 }
-
-// ─── Data class ───────────────────────────────────────────────────────────────
 
 class _CardData {
   final String heroTag;
@@ -509,8 +769,6 @@ class _CardData {
   });
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 class _Blob extends StatelessWidget {
   final Color color;
   final double size;
@@ -534,12 +792,22 @@ class _Dot extends StatelessWidget {
   final Color color;
   final double size;
 
-  const _Dot({this.top, this.bottom, this.left, this.right, required this.color, required this.size});
+  const _Dot({
+    this.top,
+    this.bottom,
+    this.left,
+    this.right,
+    required this.color,
+    required this.size,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: top, bottom: bottom, left: left, right: right,
+      top: top,
+      bottom: bottom,
+      left: left,
+      right: right,
       child: Container(
         width: size,
         height: size,
@@ -560,7 +828,7 @@ class _FallbackLogo extends StatelessWidget {
         Text('🍼', style: TextStyle(fontSize: 30)),
         SizedBox(width: 8),
         Text(
-          'BabyVoice',
+          'Speech Space',
           style: TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.w900,

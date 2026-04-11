@@ -9,12 +9,14 @@ class Mode3SegmentedView extends StatefulWidget {
   final double normalized;
   final Color accent;
   final int segments;
+  final int maxLevel;
 
   const Mode3SegmentedView({
     super.key,
     required this.normalized,
     required this.accent,
     this.segments = 10,
+    this.maxLevel = 10,
   });
 
   @override
@@ -86,7 +88,9 @@ class _Mode3SegmentedViewState extends State<Mode3SegmentedView>
   @override
   Widget build(BuildContext context) {
     final n      = widget.normalized.clamp(0.0, 1.0);
-    final active = (n * widget.segments).clamp(0, widget.segments).toInt();
+    // Use maxLevel as the effective segment count ceiling
+    final segCount = widget.maxLevel;
+    final active = (n * segCount).clamp(0, segCount).toInt();
     final color  = _zoneColor(n);
 
     return Column(
@@ -139,13 +143,11 @@ class _Mode3SegmentedViewState extends State<Mode3SegmentedView>
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
-            children: List.generate(widget.segments, (i) {
+            children: List.generate(segCount, (i) {
               final on      = i < active;
-              final segCol  = _segmentColor(i, widget.segments, n);
-              // Height: active bars scale with position + overall level
-              final maxH    = 50.0 + (i / widget.segments) * 60.0;
+              final segCol  = _segmentColor(i, segCount, n);
+              final maxH    = 50.0 + (i / segCount) * 60.0;
               final targetH = on ? maxH : 20.0;
-              // Last active bar gets extra bounce
               final isEdge  = on && i == active - 1;
 
               return AnimatedBuilder(
@@ -221,7 +223,7 @@ class _Mode3SegmentedViewState extends State<Mode3SegmentedView>
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('$active/${widget.segments}',
+                  Text('$active/${widget.maxLevel}',
                     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 20,
                       shadows: [Shadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 4)])),
                   const SizedBox(width: 8),
