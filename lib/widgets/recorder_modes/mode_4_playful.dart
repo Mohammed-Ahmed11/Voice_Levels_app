@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:voice_levels_app/l10n/app_localizations.dart';
 
 // ═══════════════════════════════════════════════════════════
 //  Mode 4 — Playful View (Kids Playful)
@@ -86,16 +87,18 @@ class _Mode4PlayfulViewState extends State<Mode4PlayfulView>
     return '🌟';
   }
 
-  String _reaction(double n) {
-    if (n < 0.20) return 'So quiet... 🤫';
-    if (n < 0.40) return 'Little louder! 😊';
-    if (n < 0.60) return 'Getting there! 🎵';
-    if (n < 0.80) return 'Yes!! Keep going! 🔥';
-    return 'INCREDIBLE!! 🎊🎉';
+  String _reaction(BuildContext context, double n) {
+    final l = AppLocalizations.of(context)!;
+    if (n < 0.20) return l.labelQuiet4;
+    if (n < 0.40) return l.labelLouder4;
+    if (n < 0.60) return l.labelGetting4;
+    if (n < 0.80) return l.labelKeep4;
+    return l.labelIncredible4;
   }
 
   @override
   Widget build(BuildContext context) {
+    final l     = AppLocalizations.of(context)!;
     final n     = widget.normalized.clamp(0.0, 1.0);
     final color = _zoneColor(n);
 
@@ -111,7 +114,7 @@ class _Mode4PlayfulViewState extends State<Mode4PlayfulView>
         // ── Reaction label ──
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 250),
-          child: Text(_reaction(n), key: ValueKey(_reaction(n)),
+          child: Text(_reaction(context, n), key: ValueKey(_reaction(context, n)),
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: color,
               shadows: [Shadow(color: color.withOpacity(0.40), offset: const Offset(0, 2), blurRadius: 8)])),
@@ -320,13 +323,13 @@ class _Mode4PlayfulViewState extends State<Mode4PlayfulView>
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _ZoneDot(label: '🐢 Quiet', color: const Color(0xFF6BCB77), active: n >= 0.05),
+            _ZoneDot(label: l.zoneDotQuietPlayful, color: const Color(0xFF6BCB77), active: n >= 0.05),
             const SizedBox(width: 6),
-            _ZoneDot(label: '🐥 Good',  color: const Color(0xFFFFD93D), active: n >= 0.40),
+            _ZoneDot(label: l.zoneDotGoodPlayful,  color: const Color(0xFFFFD93D), active: n >= 0.40),
             const SizedBox(width: 6),
-            _ZoneDot(label: '🚀 Loud',  color: const Color(0xFFFF9F1C), active: n >= 0.65),
+            _ZoneDot(label: l.zoneDotLoudPlayful,  color: const Color(0xFFFF9F1C), active: n >= 0.65),
             const SizedBox(width: 6),
-            _ZoneDot(label: '🌟 Max!',  color: const Color(0xFFFF6B6B), active: n >= 0.85),
+            _ZoneDot(label: l.zoneDotMaxPlayful,   color: const Color(0xFFFF6B6B), active: n >= 0.85),
           ],
         ),
       ],

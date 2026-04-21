@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:voice_levels_app/l10n/app_localizations.dart';
 import '../routes.dart';
 
 // ═══════════════════════════════════════════════════════════
@@ -24,76 +25,110 @@ class _ModeSelectScreenState extends State<ModeSelectScreen>
   late final List<Animation<double>> _cardFades;
   late final List<Animation<Offset>> _cardSlides;
 
-  final List<_ModeData> _modes = const [
-    _ModeData(
-      id: '1',
-      title: 'Classic',
-      desc: 'Simple level meter',
-      animal: _Animal.bear,
-      bgColor: Color(0xFF3A86FF),
-      accentColor: Color(0xFF6AAEFF),
-      shadowColor: Color(0xFF1A5CC8),
-      bgImage: 'assets/images/mode-1.png',
-      overlay: 0.30,
-      tagEmoji: '⚡',
-      tagLabel: 'Popular',
-    ),
-    _ModeData(
-      id: '2',
-      title: 'Rounded',
-      desc: 'Smooth rounded meter',
-      animal: _Animal.duck,
-      bgColor: Color(0xFFFF9F1C),
-      accentColor: Color(0xFFFFBF6A),
-      shadowColor: Color(0xFFB86A00),
-      bgImage: 'assets/images/mode-2.png',
-      overlay: 0.32,
-      tagEmoji: '✨',
-      tagLabel: 'Smooth',
-    ),
-    _ModeData(
-      id: '3',
-      title: 'Thick Meter',
-      desc: 'Bold & clear levels',
-      animal: _Animal.cat,
-      bgColor: Color(0xFFAB5CF7),
-      accentColor: Color(0xFFC98AF9),
-      shadowColor: Color(0xFF6B22B0),
-      bgImage: 'assets/images/mode-3.png',
-      overlay: 0.34,
-      tagEmoji: '💪',
-      tagLabel: 'Bold',
-    ),
-    _ModeData(
-      id: '4',
-      title: 'Playful',
-      desc: 'Fun child-friendly UI',
-      animal: _Animal.bunny,
-      bgColor: Color(0xFF2ECC71),
-      accentColor: Color(0xFF65DBA0),
-      shadowColor: Color(0xFF1A8A4A),
-      bgImage: 'assets/images/mode-4.png',
-      overlay: 0.28,
-      tagEmoji: '🎉',
-      tagLabel: 'Fun',
-    ),
-  ];
+  // الكروت بتتبنى جوه build() عشان AppLocalizations محتاجة context
+  List<_ModeData> _buildModes(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    return [
+      _ModeData(
+        id: '1',
+        title: AppLocalizations.of(context)!.modeClassic,
+        desc: AppLocalizations.of(context)!.modeClassicDesc,
+        animal: _Animal.bear,
+        bgColor: const Color(0xFF3A86FF),
+        accentColor: const Color(0xFF6AAEFF),
+        shadowColor: const Color(0xFF1A5CC8),
+        bgImage: 'assets/images/mode-1.png',
+        overlay: 0.30,
+        tagEmoji: '⚡',
+        tagLabel: AppLocalizations.of(context)!.modeTagPopular,
+      ),
+      _ModeData(
+        id: '2',
+        title: AppLocalizations.of(context)!.modeRounded,
+        desc: AppLocalizations.of(context)!.modeRoundedDesc,
+        animal: _Animal.duck,
+        bgColor: const Color(0xFFFF9F1C),
+        accentColor: const Color(0xFFFFBF6A),
+        shadowColor: const Color(0xFFB86A00),
+        bgImage: 'assets/images/mode-2.png',
+        overlay: 0.32,
+        tagEmoji: '✨',
+        tagLabel: AppLocalizations.of(context)!.modeTagSmooth,
+      ),
+      _ModeData(
+        id: '3',
+        title: AppLocalizations.of(context)!.modeThick,
+        desc: AppLocalizations.of(context)!.modeThickDesc,
+        animal: _Animal.cat,
+        bgColor: const Color(0xFFAB5CF7),
+        accentColor: const Color(0xFFC98AF9),
+        shadowColor: const Color(0xFF6B22B0),
+        bgImage: 'assets/images/mode-3.png',
+        overlay: 0.34,
+        tagEmoji: '💪',
+        tagLabel: AppLocalizations.of(context)!.modeTagBold,
+      ),
+      _ModeData(
+        id: '4',
+        title: AppLocalizations.of(context)!.modePlayful,
+        desc: AppLocalizations.of(context)!.modePlayfulDesc,
+        animal: _Animal.bunny,
+        bgColor: const Color(0xFF2ECC71),
+        accentColor: const Color(0xFF65DBA0),
+        shadowColor: const Color(0xFF1A8A4A),
+        bgImage: 'assets/images/mode-4.png',
+        overlay: 0.28,
+        tagEmoji: '🎉',
+        tagLabel: AppLocalizations.of(context)!.modeTagFun,
+      ),
+      _ModeData(
+        id: '5',
+        title: 'Arabic Letters',
+        desc: 'Listen and repeat Arabic sounds',
+        animal: _Animal.cat, // أو أي شكل يعجبك
+        bgColor: const Color(0xFFFF6B6B),
+        accentColor: const Color(0xFFFF9E9E),
+        shadowColor: const Color(0xFFC44545),
+        bgImage: 'assets/images/mode-4.png', // مؤقت لحد ما تضيف صورة
+        overlay: 0.30,
+        tagEmoji: '🅰️',
+        tagLabel: 'NEW',
+      ),
+    ];
+  }
 
   @override
   void initState() {
     super.initState();
 
-    _headerAnim = AnimationController(vsync: this, duration: const Duration(milliseconds: 600))
-      ..forward();
+    _headerAnim = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    )..forward();
 
-    _bgFloat1 = AnimationController(vsync: this, duration: const Duration(milliseconds: 3200))..repeat(reverse: true);
-    _bgFloat2 = AnimationController(vsync: this, duration: const Duration(milliseconds: 2700))..repeat(reverse: true);
-    _bgFloat3 = AnimationController(vsync: this, duration: const Duration(milliseconds: 3600))..repeat(reverse: true);
-    _bgFloat4 = AnimationController(vsync: this, duration: const Duration(milliseconds: 2400))..repeat(reverse: true);
+    _bgFloat1 = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 3200),
+    )..repeat(reverse: true);
+    _bgFloat2 = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2700),
+    )..repeat(reverse: true);
+    _bgFloat3 = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 3600),
+    )..repeat(reverse: true);
+    _bgFloat4 = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2400),
+    )..repeat(reverse: true);
 
     _cardControllers = List.generate(
-      _modes.length,
-      (i) => AnimationController(vsync: this, duration: const Duration(milliseconds: 560)),
+      5,
+      (i) => AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 560),
+      ),
     );
 
     _cardFades = _cardControllers
@@ -101,8 +136,12 @@ class _ModeSelectScreenState extends State<ModeSelectScreen>
         .toList();
 
     _cardSlides = _cardControllers
-        .map((c) => Tween<Offset>(begin: const Offset(0, 0.30), end: Offset.zero)
-            .animate(CurvedAnimation(parent: c, curve: Curves.easeOutBack)))
+        .map(
+          (c) => Tween<Offset>(
+            begin: const Offset(0, 0.30),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(parent: c, curve: Curves.easeOutBack)),
+        )
         .toList();
 
     for (int i = 0; i < _cardControllers.length; i++) {
@@ -152,18 +191,43 @@ class _ModeSelectScreenState extends State<ModeSelectScreen>
 
   @override
   Widget build(BuildContext context) {
+    final modes = _buildModes(context);
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF6ED),
       body: Stack(
         children: [
-          // Background blobs — more varied sizes and positions
-          Positioned(top: -90, left: -60, child: _Blob(color: const Color(0xFFCFE5FF), size: 280)),
-          Positioned(top: 100, right: -70, child: _Blob(color: const Color(0xFFFFDDDD), size: 220)),
-          Positioned(bottom: 160, left: -60, child: _Blob(color: const Color(0xFFC9F7DE), size: 240)),
-          Positioned(bottom: -60, right: -20, child: _Blob(color: const Color(0xFFFFF0C8), size: 200)),
-          // Extra tiny accent blobs
-          Positioned(top: 280, left: 80, child: _Blob(color: const Color(0xFFFDE8FF), size: 90)),
-          Positioned(top: 350, right: 60, child: _Blob(color: const Color(0xFFDFF5FF), size: 70)),
+          // Background blobs
+          Positioned(
+            top: -90,
+            left: -60,
+            child: _Blob(color: const Color(0xFFCFE5FF), size: 280),
+          ),
+          Positioned(
+            top: 100,
+            right: -70,
+            child: _Blob(color: const Color(0xFFFFDDDD), size: 220),
+          ),
+          Positioned(
+            bottom: 160,
+            left: -60,
+            child: _Blob(color: const Color(0xFFC9F7DE), size: 240),
+          ),
+          Positioned(
+            bottom: -60,
+            right: -20,
+            child: _Blob(color: const Color(0xFFFFF0C8), size: 200),
+          ),
+          Positioned(
+            top: 280,
+            left: 80,
+            child: _Blob(color: const Color(0xFFFDE8FF), size: 90),
+          ),
+          Positioned(
+            top: 350,
+            right: 60,
+            child: _Blob(color: const Color(0xFFDFF5FF), size: 70),
+          ),
 
           // Background dot pattern
           Positioned.fill(child: CustomPaint(painter: _DotGridPainter())),
@@ -216,10 +280,21 @@ class _ModeSelectScreenState extends State<ModeSelectScreen>
               children: [
                 // Header
                 FadeTransition(
-                  opacity: CurvedAnimation(parent: _headerAnim, curve: Curves.easeOut),
+                  opacity: CurvedAnimation(
+                    parent: _headerAnim,
+                    curve: Curves.easeOut,
+                  ),
                   child: SlideTransition(
-                    position: Tween<Offset>(begin: const Offset(0, -0.3), end: Offset.zero)
-                        .animate(CurvedAnimation(parent: _headerAnim, curve: Curves.easeOutBack)),
+                    position:
+                        Tween<Offset>(
+                          begin: const Offset(0, -0.3),
+                          end: Offset.zero,
+                        ).animate(
+                          CurvedAnimation(
+                            parent: _headerAnim,
+                            curve: Curves.easeOutBack,
+                          ),
+                        ),
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
                       child: Row(
@@ -230,11 +305,13 @@ class _ModeSelectScreenState extends State<ModeSelectScreen>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               RichText(
-                                text: const TextSpan(
+                                text: TextSpan(
                                   children: [
                                     TextSpan(
-                                      text: 'Pick a ',
-                                      style: TextStyle(
+                                      text: AppLocalizations.of(
+                                        context,
+                                      )!.modeSelectTitle1,
+                                      style: const TextStyle(
                                         fontSize: 28,
                                         fontWeight: FontWeight.w700,
                                         color: Color(0xFF2D2D2D),
@@ -242,11 +319,13 @@ class _ModeSelectScreenState extends State<ModeSelectScreen>
                                       ),
                                     ),
                                     TextSpan(
-                                      text: 'Mode!',
-                                      style: TextStyle(
+                                      text: AppLocalizations.of(
+                                        context,
+                                      )!.modeSelectTitle2,
+                                      style: const TextStyle(
                                         fontSize: 28,
                                         fontWeight: FontWeight.w900,
-                                        color: Color(0xFF9C8AE6 ),
+                                        color: Color(0xFF9C8AE6),
                                         height: 1.1,
                                       ),
                                     ),
@@ -266,7 +345,9 @@ class _ModeSelectScreenState extends State<ModeSelectScreen>
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
-                                    '4 unique looks to choose from',
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.modeSelectSubtitle,
                                     style: TextStyle(
                                       fontSize: 12.5,
                                       color: Colors.grey.shade500,
@@ -290,30 +371,43 @@ class _ModeSelectScreenState extends State<ModeSelectScreen>
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: GridView.builder(
                       physics: const BouncingScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 14,
-                        mainAxisSpacing: 14,
-                        childAspectRatio: 0.78,
-                      ),
-                      itemCount: _modes.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 14,
+                            mainAxisSpacing: 14,
+                            childAspectRatio: 0.78,
+                          ),
+                      itemCount: modes.length,
                       itemBuilder: (context, i) {
                         return FadeTransition(
                           opacity: _cardFades[i],
                           child: SlideTransition(
                             position: _cardSlides[i],
                             child: _ModeCard(
-                              data: _modes[i],
-                              onTap: () => Navigator.pushNamed(
+                              data: modes[i],
+                              tapLabel: AppLocalizations.of(
                                 context,
-                                AppRoutes.recorder,
-                                arguments: {
-                                  'modeId': _modes[i].id,
-                                  'bg': _modes[i].bgImage,
-                                  'accent': _modes[i].bgColor,
-                                  'overlay': _modes[i].overlay,
-                                },
-                              ),
+                              )!.modeTapToUse,
+                              onTap: () {
+                                if (modes[i].id == '5') {
+                                  Navigator.pushNamed(
+                                    context,
+                                    AppRoutes.arabicLetters,
+                                  );
+                                } else {
+                                  Navigator.pushNamed(
+                                    context,
+                                    AppRoutes.recorder,
+                                    arguments: {
+                                      'modeId': modes[i].id,
+                                      'bg': modes[i].bgImage,
+                                      'accent': modes[i].bgColor,
+                                      'overlay': modes[i].overlay,
+                                    },
+                                  );
+                                }
+                              },
                             ),
                           ),
                         );
@@ -372,8 +466,11 @@ class _BackButtonState extends State<_BackButton> {
               ),
             ],
           ),
-          child: const Icon(Icons.arrow_back_ios_new_rounded,
-              size: 18, color: Color(0xFF3D3D3D)),
+          child: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            size: 18,
+            color: Color(0xFF3D3D3D),
+          ),
         ),
       ),
     );
@@ -383,9 +480,14 @@ class _BackButtonState extends State<_BackButton> {
 // ─── Mode Card ────────────────────────────────────────────
 class _ModeCard extends StatefulWidget {
   final _ModeData data;
+  final String tapLabel;
   final VoidCallback onTap;
 
-  const _ModeCard({required this.data, required this.onTap});
+  const _ModeCard({
+    required this.data,
+    required this.tapLabel,
+    required this.onTap,
+  });
 
   @override
   State<_ModeCard> createState() => _ModeCardState();
@@ -404,17 +506,24 @@ class _ModeCardState extends State<_ModeCard> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    _pressCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 120));
-    _scaleAnim = Tween<double>(begin: 1.0, end: 0.93)
-        .animate(CurvedAnimation(parent: _pressCtrl, curve: Curves.easeOut));
+    _pressCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 120),
+    );
+    _scaleAnim = Tween<double>(
+      begin: 1.0,
+      end: 0.93,
+    ).animate(CurvedAnimation(parent: _pressCtrl, curve: Curves.easeOut));
 
     _animalBounce = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 1900 + (widget.data.id.hashCode % 500)),
     )..repeat(reverse: true);
 
-    _bounceAnim = Tween<double>(begin: 0.0, end: 1.0)
-        .animate(CurvedAnimation(parent: _animalBounce, curve: Curves.easeInOut));
+    _bounceAnim = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animalBounce, curve: Curves.easeInOut));
 
     _shimmer = AnimationController(
       vsync: this,
@@ -454,26 +563,22 @@ class _ModeCardState extends State<_ModeCard> with TickerProviderStateMixin {
       onTapCancel: () => _pressCtrl.reverse(),
       child: AnimatedBuilder(
         animation: _scaleAnim,
-        builder: (_, child) => Transform.scale(scale: _scaleAnim.value, child: child),
+        builder: (_, child) =>
+            Transform.scale(scale: _scaleAnim.value, child: child),
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(28),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                widget.data.bgColor,
-                widget.data.shadowColor,
-              ],
+              colors: [widget.data.bgColor, widget.data.shadowColor],
             ),
             boxShadow: [
-              // Hard offset shadow (cartoon style)
               BoxShadow(
                 color: widget.data.shadowColor,
                 blurRadius: 0,
                 offset: const Offset(0, 6),
               ),
-              // Soft glow
               BoxShadow(
                 color: widget.data.bgColor.withOpacity(0.45),
                 blurRadius: 24,
@@ -485,7 +590,7 @@ class _ModeCardState extends State<_ModeCard> with TickerProviderStateMixin {
             borderRadius: BorderRadius.circular(28),
             child: Stack(
               children: [
-                // Decorative circle shapes in background
+                // Decorative circles
                 Positioned(
                   top: -30,
                   right: -30,
@@ -524,25 +629,55 @@ class _ModeCardState extends State<_ModeCard> with TickerProviderStateMixin {
                 ),
 
                 // Sparkle dots
-                Positioned(top: 12, right: 14, child: _Sparkle(color: Colors.white.withOpacity(0.70), size: 7)),
-                Positioned(top: 30, right: 36, child: _Sparkle(color: Colors.white.withOpacity(0.40), size: 5)),
-                Positioned(top: 8, left: 16, child: _Sparkle(color: Colors.white.withOpacity(0.35), size: 4)),
+                Positioned(
+                  top: 12,
+                  right: 14,
+                  child: _Sparkle(
+                    color: Colors.white.withOpacity(0.70),
+                    size: 7,
+                  ),
+                ),
+                Positioned(
+                  top: 30,
+                  right: 36,
+                  child: _Sparkle(
+                    color: Colors.white.withOpacity(0.40),
+                    size: 5,
+                  ),
+                ),
+                Positioned(
+                  top: 8,
+                  left: 16,
+                  child: _Sparkle(
+                    color: Colors.white.withOpacity(0.35),
+                    size: 4,
+                  ),
+                ),
 
-                // Tag badge (top-left)
+                // Tag badge
                 Positioned(
                   top: 10,
                   left: 10,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.22),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.white.withOpacity(0.35), width: 1),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.35),
+                        width: 1,
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(widget.data.tagEmoji, style: const TextStyle(fontSize: 10)),
+                        Text(
+                          widget.data.tagEmoji,
+                          style: const TextStyle(fontSize: 10),
+                        ),
                         const SizedBox(width: 3),
                         Text(
                           widget.data.tagLabel,
@@ -578,7 +713,7 @@ class _ModeCardState extends State<_ModeCard> with TickerProviderStateMixin {
                   ),
                 ),
 
-                // Shadow under animal (squish effect)
+                // Shadow under animal
                 Positioned(
                   top: 106,
                   left: 0,
@@ -629,7 +764,6 @@ class _ModeCardState extends State<_ModeCard> with TickerProviderStateMixin {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Mode number + title
                         Row(
                           children: [
                             Container(
@@ -638,15 +772,19 @@ class _ModeCardState extends State<_ModeCard> with TickerProviderStateMixin {
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.25),
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white.withOpacity(0.60), width: 1.5),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.60),
+                                  width: 1.5,
+                                ),
                               ),
                               child: Center(
                                 child: Text(
                                   widget.data.id,
                                   style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 10),
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 10,
+                                  ),
                                 ),
                               ),
                             ),
@@ -660,7 +798,11 @@ class _ModeCardState extends State<_ModeCard> with TickerProviderStateMixin {
                                   fontWeight: FontWeight.w900,
                                   letterSpacing: -0.4,
                                   shadows: [
-                                    Shadow(color: Colors.black38, offset: Offset(0, 1), blurRadius: 4)
+                                    Shadow(
+                                      color: Colors.black38,
+                                      offset: Offset(0, 1),
+                                      blurRadius: 4,
+                                    ),
                                   ],
                                 ),
                               ),
@@ -671,30 +813,44 @@ class _ModeCardState extends State<_ModeCard> with TickerProviderStateMixin {
                         Text(
                           widget.data.desc,
                           style: TextStyle(
-                              color: Colors.white.withOpacity(0.85),
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600),
+                            color: Colors.white.withOpacity(0.85),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         const SizedBox(height: 9),
                         // CTA button
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 11,
+                            vertical: 5,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.24),
                             borderRadius: BorderRadius.circular(18),
-                            border: Border.all(color: Colors.white.withOpacity(0.50), width: 1),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.50),
+                              width: 1,
+                            ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Icon(Icons.play_arrow_rounded, color: Colors.white, size: 13),
-                              SizedBox(width: 4),
-                              Text('Tap to use',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 10.5,
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: 0.1)),
+                            children: [
+                              const Icon(
+                                Icons.play_arrow_rounded,
+                                color: Colors.white,
+                                size: 13,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                widget.tapLabel,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.1,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -743,31 +899,38 @@ class _BottomBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(26),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.22),
-                blurRadius: 22,
-                offset: const Offset(0, 8)),
+              color: Colors.black.withOpacity(0.22),
+              blurRadius: 22,
+              offset: const Offset(0, 8),
+            ),
           ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             _NavItem(
-                emoji: '🏠',
-                label: 'Home',
-                onTap: () => Navigator.pushNamedAndRemoveUntil(
-                    screenContext, AppRoutes.home, (r) => false)),
+              emoji: '🏠',
+              label: AppLocalizations.of(screenContext)!.navHome,
+              onTap: () => Navigator.pushNamedAndRemoveUntil(
+                screenContext,
+                AppRoutes.home,
+                (r) => false,
+              ),
+            ),
             _NavDivider(),
             _NavItem(
-                emoji: '🎵',
-                label: 'Records',
-                onTap: () => Navigator.pushNamed(
-                    screenContext, AppRoutes.recordings)),
+              emoji: '🎵',
+              label: AppLocalizations.of(screenContext)!.navRecords,
+              onTap: () =>
+                  Navigator.pushNamed(screenContext, AppRoutes.recordings),
+            ),
             _NavDivider(),
             _NavItem(
-                emoji: '⚙️',
-                label: 'Options',
-                onTap: () =>
-                    Navigator.pushNamed(screenContext, AppRoutes.settings)),
+              emoji: '⚙️',
+              label: AppLocalizations.of(screenContext)!.navOptions,
+              onTap: () =>
+                  Navigator.pushNamed(screenContext, AppRoutes.settings),
+            ),
           ],
         ),
       ),
@@ -790,7 +953,11 @@ class _NavItem extends StatefulWidget {
   final String emoji;
   final String label;
   final VoidCallback onTap;
-  const _NavItem({required this.emoji, required this.label, required this.onTap});
+  const _NavItem({
+    required this.emoji,
+    required this.label,
+    required this.onTap,
+  });
 
   @override
   State<_NavItem> createState() => _NavItemState();
@@ -828,9 +995,10 @@ class _NavItemState extends State<_NavItem> {
               Text(
                 widget.label,
                 style: TextStyle(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white.withOpacity(0.82)),
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white.withOpacity(0.82),
+                ),
               ),
             ],
           ),
@@ -898,14 +1066,14 @@ class _Blob extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-      );
+    width: size,
+    height: size,
+    decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+  );
 }
 
 // ═══════════════════════════════════════════════════════════
-//  Animal Painters — all fully detailed
+//  Animal Painters — بدون تغيير
 // ═══════════════════════════════════════════════════════════
 
 class _BearPainter extends CustomPainter {
@@ -914,7 +1082,9 @@ class _BearPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final p = Paint()..color = color..style = PaintingStyle.fill;
+    final p = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
     final dark = Paint()..color = color.withOpacity(0.50);
     final white = Paint()..color = Colors.white.withOpacity(0.92);
     final black = Paint()..color = const Color(0xFF1A1A1A);
@@ -923,38 +1093,31 @@ class _BearPainter extends CustomPainter {
     final cy = size.height / 2;
     final r = size.width * 0.34;
 
-    // Ears
     canvas.drawCircle(Offset(cx - r * 0.68, cy - r * 0.74), r * 0.36, p);
     canvas.drawCircle(Offset(cx + r * 0.68, cy - r * 0.74), r * 0.36, p);
     canvas.drawCircle(Offset(cx - r * 0.68, cy - r * 0.74), r * 0.20, dark);
     canvas.drawCircle(Offset(cx + r * 0.68, cy - r * 0.74), r * 0.20, dark);
-
-    // Head
     canvas.drawCircle(Offset(cx, cy), r, p);
-
-    // Muzzle
     canvas.drawOval(
-        Rect.fromCenter(center: Offset(cx, cy + r * 0.34), width: r * 0.96, height: r * 0.60),
-        dark);
-
-    // Eyes (white + pupil + shine)
+      Rect.fromCenter(
+        center: Offset(cx, cy + r * 0.34),
+        width: r * 0.96,
+        height: r * 0.60,
+      ),
+      dark,
+    );
     canvas.drawCircle(Offset(cx - r * 0.34, cy - r * 0.14), r * 0.16, white);
     canvas.drawCircle(Offset(cx + r * 0.34, cy - r * 0.14), r * 0.16, white);
     canvas.drawCircle(Offset(cx - r * 0.32, cy - r * 0.12), r * 0.095, black);
     canvas.drawCircle(Offset(cx + r * 0.32, cy - r * 0.12), r * 0.095, black);
-    // Eye shine
     canvas.drawCircle(Offset(cx - r * 0.26, cy - r * 0.20), r * 0.040, white);
     canvas.drawCircle(Offset(cx + r * 0.38, cy - r * 0.20), r * 0.040, white);
-
-    // Nose
     final nosePath = Path()
       ..moveTo(cx, cy + r * 0.20)
       ..lineTo(cx - r * 0.12, cy + r * 0.06)
       ..lineTo(cx + r * 0.12, cy + r * 0.06)
       ..close();
     canvas.drawPath(nosePath, nose);
-
-    // Smile
     final smilePaint = Paint()
       ..color = nose.color
       ..style = PaintingStyle.stroke
@@ -976,7 +1139,9 @@ class _DuckPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final p = Paint()..color = color..style = PaintingStyle.fill;
+    final p = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
     final white = Paint()..color = Colors.white.withOpacity(0.92);
     final black = Paint()..color = const Color(0xFF1A1A1A);
     final orange = Paint()..color = const Color(0xFFFF8C00);
@@ -985,40 +1150,39 @@ class _DuckPainter extends CustomPainter {
     final cy = size.height / 2;
     final r = size.width * 0.30;
 
-    // Body
     canvas.drawOval(
-        Rect.fromCenter(center: Offset(cx, cy + r * 0.55), width: r * 1.6, height: r * 1.2), p);
-
-    // Head
+      Rect.fromCenter(
+        center: Offset(cx, cy + r * 0.55),
+        width: r * 1.6,
+        height: r * 1.2,
+      ),
+      p,
+    );
     canvas.drawCircle(Offset(cx, cy - r * 0.08), r, p);
-
-    // Wing highlight
     final wingPaint = Paint()..color = color.withOpacity(0.60);
     canvas.drawOval(
-        Rect.fromCenter(center: Offset(cx - r * 0.20, cy + r * 0.70), width: r * 0.70, height: r * 0.38),
-        wingPaint);
-
-    // Beak (upper + lower)
+      Rect.fromCenter(
+        center: Offset(cx - r * 0.20, cy + r * 0.70),
+        width: r * 0.70,
+        height: r * 0.38,
+      ),
+      wingPaint,
+    );
     final upperBeak = Path()
       ..moveTo(cx + r * 0.82, cy - r * 0.08)
       ..lineTo(cx + r * 1.28, cy)
       ..lineTo(cx + r * 0.82, cy + r * 0.12)
       ..close();
     canvas.drawPath(upperBeak, orange);
-
     final lowerBeak = Path()
       ..moveTo(cx + r * 0.82, cy + r * 0.10)
       ..lineTo(cx + r * 1.20, cy + r * 0.16)
       ..lineTo(cx + r * 0.82, cy + r * 0.24)
       ..close();
     canvas.drawPath(lowerBeak, darkOrange);
-
-    // Eye white + pupil + shine
     canvas.drawCircle(Offset(cx + r * 0.30, cy - r * 0.22), r * 0.17, white);
     canvas.drawCircle(Offset(cx + r * 0.32, cy - r * 0.20), r * 0.10, black);
     canvas.drawCircle(Offset(cx + r * 0.26, cy - r * 0.26), r * 0.040, white);
-
-    // Cheek blush
     final blush = Paint()..color = Colors.pink.withOpacity(0.30);
     canvas.drawCircle(Offset(cx + r * 0.06, cy + r * 0.06), r * 0.16, blush);
   }
@@ -1033,7 +1197,9 @@ class _CatPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final p = Paint()..color = color..style = PaintingStyle.fill;
+    final p = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
     final dark = Paint()..color = color.withOpacity(0.55);
     final white = Paint()..color = Colors.white.withOpacity(0.92);
     final black = Paint()..color = const Color(0xFF1A1A1A);
@@ -1042,87 +1208,104 @@ class _CatPainter extends CustomPainter {
     final cy = size.height / 2;
     final r = size.width * 0.32;
 
-    // Ears (triangles)
     final leftEar = Path()
       ..moveTo(cx - r * 0.80, cy - r * 0.50)
       ..lineTo(cx - r * 0.38, cy - r * 1.05)
       ..lineTo(cx - r * 0.10, cy - r * 0.68)
       ..close();
     canvas.drawPath(leftEar, p);
-
     final rightEar = Path()
       ..moveTo(cx + r * 0.80, cy - r * 0.50)
       ..lineTo(cx + r * 0.38, cy - r * 1.05)
       ..lineTo(cx + r * 0.10, cy - r * 0.68)
       ..close();
     canvas.drawPath(rightEar, p);
-
-    // Inner ears (pink)
     final leftInner = Path()
       ..moveTo(cx - r * 0.70, cy - r * 0.55)
       ..lineTo(cx - r * 0.38, cy - r * 0.94)
       ..lineTo(cx - r * 0.14, cy - r * 0.66)
       ..close();
     canvas.drawPath(leftInner, pink);
-
     final rightInner = Path()
       ..moveTo(cx + r * 0.70, cy - r * 0.55)
       ..lineTo(cx + r * 0.38, cy - r * 0.94)
       ..lineTo(cx + r * 0.14, cy - r * 0.66)
       ..close();
     canvas.drawPath(rightInner, pink);
-
-    // Head
     canvas.drawCircle(Offset(cx, cy), r, p);
-
-    // Muzzle
     canvas.drawOval(
-        Rect.fromCenter(center: Offset(cx, cy + r * 0.30), width: r * 0.80, height: r * 0.48),
-        dark);
-
-    // Eyes (cat-like, slightly oval)
+      Rect.fromCenter(
+        center: Offset(cx, cy + r * 0.30),
+        width: r * 0.80,
+        height: r * 0.48,
+      ),
+      dark,
+    );
     canvas.drawOval(
-        Rect.fromCenter(center: Offset(cx - r * 0.34, cy - r * 0.14), width: r * 0.32, height: r * 0.26),
-        white);
+      Rect.fromCenter(
+        center: Offset(cx - r * 0.34, cy - r * 0.14),
+        width: r * 0.32,
+        height: r * 0.26,
+      ),
+      white,
+    );
     canvas.drawOval(
-        Rect.fromCenter(center: Offset(cx + r * 0.34, cy - r * 0.14), width: r * 0.32, height: r * 0.26),
-        white);
-
-    // Pupils (vertical slits)
+      Rect.fromCenter(
+        center: Offset(cx + r * 0.34, cy - r * 0.14),
+        width: r * 0.32,
+        height: r * 0.26,
+      ),
+      white,
+    );
     canvas.drawOval(
-        Rect.fromCenter(center: Offset(cx - r * 0.34, cy - r * 0.14), width: r * 0.10, height: r * 0.22),
-        black);
+      Rect.fromCenter(
+        center: Offset(cx - r * 0.34, cy - r * 0.14),
+        width: r * 0.10,
+        height: r * 0.22,
+      ),
+      black,
+    );
     canvas.drawOval(
-        Rect.fromCenter(center: Offset(cx + r * 0.34, cy - r * 0.14), width: r * 0.10, height: r * 0.22),
-        black);
-
-    // Eye shine
+      Rect.fromCenter(
+        center: Offset(cx + r * 0.34, cy - r * 0.14),
+        width: r * 0.10,
+        height: r * 0.22,
+      ),
+      black,
+    );
     canvas.drawCircle(Offset(cx - r * 0.28, cy - r * 0.20), r * 0.040, white);
     canvas.drawCircle(Offset(cx + r * 0.40, cy - r * 0.20), r * 0.040, white);
-
-    // Nose (small triangle)
     final nosePath = Path()
       ..moveTo(cx, cy + r * 0.16)
       ..lineTo(cx - r * 0.09, cy + r * 0.06)
       ..lineTo(cx + r * 0.09, cy + r * 0.06)
       ..close();
     canvas.drawPath(nosePath, pink);
-
-    // Whiskers
     final whiskerPaint = Paint()
       ..color = Colors.white.withOpacity(0.75)
       ..strokeWidth = r * 0.045
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
-
-    // Left whiskers
-    canvas.drawLine(Offset(cx - r * 0.24, cy + r * 0.18), Offset(cx - r * 0.82, cy + r * 0.10), whiskerPaint);
-    canvas.drawLine(Offset(cx - r * 0.24, cy + r * 0.22), Offset(cx - r * 0.82, cy + r * 0.28), whiskerPaint);
-    // Right whiskers
-    canvas.drawLine(Offset(cx + r * 0.24, cy + r * 0.18), Offset(cx + r * 0.82, cy + r * 0.10), whiskerPaint);
-    canvas.drawLine(Offset(cx + r * 0.24, cy + r * 0.22), Offset(cx + r * 0.82, cy + r * 0.28), whiskerPaint);
-
-    // Smile
+    canvas.drawLine(
+      Offset(cx - r * 0.24, cy + r * 0.18),
+      Offset(cx - r * 0.82, cy + r * 0.10),
+      whiskerPaint,
+    );
+    canvas.drawLine(
+      Offset(cx - r * 0.24, cy + r * 0.22),
+      Offset(cx - r * 0.82, cy + r * 0.28),
+      whiskerPaint,
+    );
+    canvas.drawLine(
+      Offset(cx + r * 0.24, cy + r * 0.18),
+      Offset(cx + r * 0.82, cy + r * 0.10),
+      whiskerPaint,
+    );
+    canvas.drawLine(
+      Offset(cx + r * 0.24, cy + r * 0.22),
+      Offset(cx + r * 0.82, cy + r * 0.28),
+      whiskerPaint,
+    );
     final smilePaint = Paint()
       ..color = const Color(0xFF3A1A1A)
       ..style = PaintingStyle.stroke
@@ -1144,7 +1327,9 @@ class _BunnyPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final p = Paint()..color = color..style = PaintingStyle.fill;
+    final p = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
     final white = Paint()..color = Colors.white.withOpacity(0.92);
     final black = Paint()..color = const Color(0xFF1A1A1A);
     final pink = Paint()..color = const Color(0xFFFFB3C6);
@@ -1152,49 +1337,53 @@ class _BunnyPainter extends CustomPainter {
     final cy = size.height / 2;
     final r = size.width * 0.30;
 
-    // Long ears
     final leftEarOuter = RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset(cx - r * 0.44, cy - r * 1.10), width: r * 0.44, height: r * 1.0),
-        Radius.circular(r * 0.22));
+      Rect.fromCenter(
+        center: Offset(cx - r * 0.44, cy - r * 1.10),
+        width: r * 0.44,
+        height: r * 1.0,
+      ),
+      Radius.circular(r * 0.22),
+    );
     canvas.drawRRect(leftEarOuter, p);
-
     final rightEarOuter = RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset(cx + r * 0.44, cy - r * 1.10), width: r * 0.44, height: r * 1.0),
-        Radius.circular(r * 0.22));
+      Rect.fromCenter(
+        center: Offset(cx + r * 0.44, cy - r * 1.10),
+        width: r * 0.44,
+        height: r * 1.0,
+      ),
+      Radius.circular(r * 0.22),
+    );
     canvas.drawRRect(rightEarOuter, p);
-
-    // Inner ear (pink)
     final leftEarInner = RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset(cx - r * 0.44, cy - r * 1.10), width: r * 0.22, height: r * 0.70),
-        Radius.circular(r * 0.11));
+      Rect.fromCenter(
+        center: Offset(cx - r * 0.44, cy - r * 1.10),
+        width: r * 0.22,
+        height: r * 0.70,
+      ),
+      Radius.circular(r * 0.11),
+    );
     canvas.drawRRect(leftEarInner, pink);
-
     final rightEarInner = RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset(cx + r * 0.44, cy - r * 1.10), width: r * 0.22, height: r * 0.70),
-        Radius.circular(r * 0.11));
+      Rect.fromCenter(
+        center: Offset(cx + r * 0.44, cy - r * 1.10),
+        width: r * 0.22,
+        height: r * 0.70,
+      ),
+      Radius.circular(r * 0.11),
+    );
     canvas.drawRRect(rightEarInner, pink);
-
-    // Head
     canvas.drawCircle(Offset(cx, cy), r, p);
-
-    // Chubby cheeks
     final blush = Paint()..color = Colors.pink.withOpacity(0.28);
     canvas.drawCircle(Offset(cx - r * 0.44, cy + r * 0.18), r * 0.20, blush);
     canvas.drawCircle(Offset(cx + r * 0.44, cy + r * 0.18), r * 0.20, blush);
-
-    // Eyes (big round)
     canvas.drawCircle(Offset(cx - r * 0.32, cy - r * 0.12), r * 0.18, white);
     canvas.drawCircle(Offset(cx + r * 0.32, cy - r * 0.12), r * 0.18, white);
     canvas.drawCircle(Offset(cx - r * 0.30, cy - r * 0.10), r * 0.11, black);
     canvas.drawCircle(Offset(cx + r * 0.30, cy - r * 0.10), r * 0.11, black);
-    // Shine
     canvas.drawCircle(Offset(cx - r * 0.24, cy - r * 0.16), r * 0.04, white);
     canvas.drawCircle(Offset(cx + r * 0.36, cy - r * 0.16), r * 0.04, white);
-
-    // Nose (pink circle)
     canvas.drawCircle(Offset(cx, cy + r * 0.10), r * 0.085, pink);
-
-    // Smile
     final smilePaint = Paint()
       ..color = const Color(0xFF3A1A1A)
       ..style = PaintingStyle.stroke
@@ -1204,16 +1393,18 @@ class _BunnyPainter extends CustomPainter {
       ..moveTo(cx - r * 0.16, cy + r * 0.25)
       ..quadraticBezierTo(cx, cy + r * 0.38, cx + r * 0.16, cy + r * 0.25);
     canvas.drawPath(smilePath, smilePaint);
-
-    // Little teeth
-    final teethPaint = Paint()..color = Colors.white..style = PaintingStyle.fill;
+    final teethPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
     final leftTooth = RRect.fromRectAndRadius(
-        Rect.fromLTWH(cx - r * 0.12, cy + r * 0.21, r * 0.11, r * 0.12),
-        Radius.circular(r * 0.03));
+      Rect.fromLTWH(cx - r * 0.12, cy + r * 0.21, r * 0.11, r * 0.12),
+      Radius.circular(r * 0.03),
+    );
     canvas.drawRRect(leftTooth, teethPaint);
     final rightTooth = RRect.fromRectAndRadius(
-        Rect.fromLTWH(cx + r * 0.01, cy + r * 0.21, r * 0.11, r * 0.12),
-        Radius.circular(r * 0.03));
+      Rect.fromLTWH(cx + r * 0.01, cy + r * 0.21, r * 0.11, r * 0.12),
+      Radius.circular(r * 0.03),
+    );
     canvas.drawRRect(rightTooth, teethPaint);
   }
 

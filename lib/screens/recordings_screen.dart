@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-
+import 'package:voice_levels_app/l10n/app_localizations.dart';
 import '../models/parent_profile.dart';
 import '../models/recording_item.dart';
 import '../routes.dart';
@@ -109,6 +109,8 @@ class _RecordingsScreenState extends State<RecordingsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF4E8),
       body: Stack(
@@ -158,7 +160,7 @@ class _RecordingsScreenState extends State<RecordingsScreen>
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
-                    'Tap a patient to view their recordings 🎵',
+                    t.tapPatient,
                     style: TextStyle(fontSize: 13, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
                   ),
                 ),
@@ -176,6 +178,7 @@ class _RecordingsScreenState extends State<RecordingsScreen>
   }
 
   Widget _buildHeader() {
+    final t = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
       child: Row(
@@ -198,9 +201,9 @@ class _RecordingsScreenState extends State<RecordingsScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 RichText(
-                  text: const TextSpan(children: [
-                    TextSpan(text: 'Patient ', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Color(0xFF3D3D3D))),
-                    TextSpan(text: 'Reports', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF9C8AE6))),
+                  text: TextSpan(children: [
+                    TextSpan(text: t.patient, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Color(0xFF3D3D3D))),
+                    TextSpan(text: t.reports, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF9C8AE6))),
                   ]),
                 ),
                 Text(
@@ -287,11 +290,12 @@ class _ProfileReportCardState extends State<_ProfileReportCard> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     final recs = widget.recordings;
     final count = recs.length;
     final peakLevel = recs.isEmpty ? 0 : recs.map((r) => r.level).reduce(max);
     final lastDate = recs.isEmpty ? null : recs.first.createdAt;
-    final name = widget.profile.childName.trim().isEmpty ? 'Patient ${widget.index + 1}' : widget.profile.childName;
+    final name = widget.profile.childName.trim().isEmpty ? '${t.patient} ${widget.index + 1}' : widget.profile.childName;
     final parentName = widget.profile.parentName.trim().isEmpty ? '' : widget.profile.parentName;
     final color = widget.accentColor;
     final shadowColor = HSLColor.fromColor(color).withLightness((HSLColor.fromColor(color).lightness - 0.18).clamp(0.0, 1.0)).toColor();
@@ -356,9 +360,9 @@ class _ProfileReportCardState extends State<_ProfileReportCard> {
                           const SizedBox(height: 6),
                           Row(
                             children: [
-                              _StatChip(label: '$count recording${count == 1 ? '' : 's'}', emoji: '🎙️', color: color),
+                              _StatChip(label: '$count ${count == 1 ? t.recording : t.recordings}', emoji: '🎙️', color: color),
                               const SizedBox(width: 8),
-                              _StatChip(label: 'Peak $peakLevel', emoji: '⭐', color: const Color(0xFFFF9F1C)),
+                              _StatChip(label: '${t.peak} $peakLevel', emoji: '⭐', color: const Color(0xFFFF9F1C)),
                             ],
                           ),
                         ],
@@ -395,7 +399,7 @@ class _ProfileReportCardState extends State<_ProfileReportCard> {
               if (count > 0)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-                  child: _MiniProgressBar(color: color, value: count, label: '$count sessions'),
+                  child: _MiniProgressBar(color: color, value: count, label: '$count ${t.sessions}'),
                 ),
             ],
           ),
@@ -549,6 +553,7 @@ class _ProfileRecordingsScreenState extends State<ProfileRecordingsScreen>
   }
 
   Future<void> _confirmDelete(RecordingItem r) async {
+    final t = AppLocalizations.of(context)!;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => Dialog(
@@ -561,15 +566,15 @@ class _ProfileRecordingsScreenState extends State<ProfileRecordingsScreen>
             children: [
               const Text('🗑️', style: TextStyle(fontSize: 44)),
               const SizedBox(height: 10),
-              const Text('Delete Recording?', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w900, color: Color(0xFF3D3D3D)), textAlign: TextAlign.center),
+              Text(t.deleteRecording, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900, color: Color(0xFF3D3D3D)), textAlign: TextAlign.center),
               const SizedBox(height: 6),
-              Text('This recording will be permanently deleted.', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: Colors.grey.shade500)),
+              Text(t.deleteRecordingConfirm, textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: Colors.grey.shade500)),
               const SizedBox(height: 20),
               Row(children: [
                 Expanded(child: GestureDetector(
                   onTap: () => Navigator.pop(context, false),
                   child: Container(height: 46, decoration: BoxDecoration(color: const Color(0xFFE8E0D5), borderRadius: BorderRadius.circular(14)),
-                    child: const Center(child: Text('Cancel', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF3D3D3D))))),
+                    child: Center(child: Text(t.cancel, style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF3D3D3D))))),
                 )),
                 const SizedBox(width: 12),
                 Expanded(child: GestureDetector(
@@ -577,7 +582,7 @@ class _ProfileRecordingsScreenState extends State<ProfileRecordingsScreen>
                   child: Container(height: 46,
                     decoration: BoxDecoration(color: const Color(0xFFFF6B6B), borderRadius: BorderRadius.circular(14),
                       boxShadow: const [BoxShadow(color: Color(0xFFCC3333), blurRadius: 0, offset: Offset(0, 4))]),
-                    child: const Center(child: Text('Delete', style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white)))),
+                    child: Center(child: Text(t.delete, style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white)))),
                 )),
               ]),
             ],
@@ -595,6 +600,7 @@ class _ProfileRecordingsScreenState extends State<ProfileRecordingsScreen>
   Widget build(BuildContext context) {
     final name = widget.profile.childName.trim().isEmpty ? 'Patient' : widget.profile.childName;
     final color = widget.accentColor;
+    final t = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF4E8),
@@ -642,7 +648,7 @@ class _ProfileRecordingsScreenState extends State<ProfileRecordingsScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF2D2D2D))),
-                            Text('${_items.length} recording${_items.length == 1 ? '' : 's'}',
+                            Text('${_items.length} ${_items.length == 1 ? t.recording : t.recordings}',
                               style: TextStyle(fontSize: 12, color: Colors.grey.shade500, fontWeight: FontWeight.w500)),
                           ],
                         ),
@@ -845,6 +851,7 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -858,9 +865,9 @@ class _EmptyState extends StatelessWidget {
             child: CustomPaint(size: const Size(110, 110), painter: const _DuckPainter(color: Color(0xFF6BCB77))),
           ),
           const SizedBox(height: 20),
-          const Text('No patients yet!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF3D3D3D))),
+          Text(t.noPatients, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF3D3D3D))),
           const SizedBox(height: 6),
-          Text('Add a patient profile first 👨‍👩‍👧', style: TextStyle(fontSize: 13.5, color: Colors.grey.shade500)),
+          Text(t.addPatientHint, style: TextStyle(fontSize: 13.5, color: Colors.grey.shade500)),
           const SizedBox(height: 24),
           GestureDetector(
             onTap: () => Navigator.pushNamed(context, AppRoutes.profile),
@@ -873,10 +880,10 @@ class _EmptyState extends StatelessWidget {
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Text('👤', style: TextStyle(fontSize: 18)),
-                  SizedBox(width: 8),
-                  Text('Add Patient', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w900)),
+                children: [
+                  const Text('👤', style: TextStyle(fontSize: 18)),
+                  const SizedBox(width: 8),
+                  Text(t.addPatient, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w900)),
                 ],
               ),
             ),
@@ -895,6 +902,7 @@ class _ProfileEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -908,9 +916,9 @@ class _ProfileEmptyState extends StatelessWidget {
             child: CustomPaint(size: const Size(100, 100), painter: _DuckPainter(color: color)),
           ),
           const SizedBox(height: 20),
-          Text('No recordings for $name', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF3D3D3D))),
+          Text('${t.noRecordingsFor} $name', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF3D3D3D))),
           const SizedBox(height: 6),
-          Text('Start a session to see results here 🎙️', style: TextStyle(fontSize: 13, color: Colors.grey.shade500)),
+          Text(t.startSessionHint, style: TextStyle(fontSize: 13, color: Colors.grey.shade500)),
           const SizedBox(height: 24),
           GestureDetector(
             onTap: () => Navigator.pushNamed(context, AppRoutes.modeSelect),
@@ -923,10 +931,10 @@ class _ProfileEmptyState extends StatelessWidget {
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Text('🎙️', style: TextStyle(fontSize: 18)),
-                  SizedBox(width: 8),
-                  Text('Start Recording', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w900)),
+                children: [
+                  const Text('🎙️', style: TextStyle(fontSize: 18)),
+                  const SizedBox(width: 8),
+                  Text(t.startRecording, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w900)),
                 ],
               ),
             ),

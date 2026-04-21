@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:voice_levels_app/l10n/app_localizations.dart';
 import '../routes.dart';
 import '../services/local_db.dart';
 import '../models/parent_profile.dart';
@@ -17,53 +18,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late final List<Animation<double>> _cardFades;
   late final List<Animation<Offset>> _cardSlides;
 
-  final List<_CardData> _cards = const [
-    _CardData(
-      heroTag: 'hero_start',
-      emoji: '🎙️',
-      title: 'Start',
-      subtitle: 'Record something fun!',
-      bgColor: Color(0xFFFF6B6B),
-      accentColor: Color(0xFFFF8E8E),
-      shadowColor: Color(0xFFD94F4F),
-      stars: [Color(0xFFFFD93D), Color(0xFFFFE98A)],
-      route: AppRoutes.modeSelect,
-    ),
-    _CardData(
-      heroTag: 'hero_recordings',
-      emoji: '🎵',
-      title: 'Reports',
-      subtitle: 'Listen & share!',
-      bgColor: Color(0xFF6BCB77),
-      accentColor: Color(0xFF8EDA99),
-      shadowColor: Color(0xFF4DA85A),
-      stars: [Color(0xFFFFD93D), Color(0xFFFFA500)],
-      route: AppRoutes.recordings,
-    ),
-    _CardData(
-      heroTag: 'hero_profile',
-      emoji: '👶',
-      title: 'Profiles',
-      subtitle: 'Patients / kids',
-      bgColor: Color(0xFF4D96FF),
-      accentColor: Color(0xFF7AB3FF),
-      shadowColor: Color(0xFF2B72D9),
-      stars: [Color(0xFFFF6B9D), Color(0xFFFF9DC8)],
-      route: AppRoutes.profile,
-    ),
-    _CardData(
-      heroTag: 'hero_settings',
-      emoji: '⚙️',
-      title: 'Options',
-      subtitle: 'App settings',
-      bgColor: Color(0xFFFF9F1C),
-      accentColor: Color(0xFFFFBB5C),
-      shadowColor: Color(0xFFD97F00),
-      stars: [Color(0xFF6BCB77), Color(0xFFA8EDBB)],
-      route: AppRoutes.settings,
-    ),
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -74,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     )..repeat(reverse: true);
 
     _cardControllers = List.generate(
-      _cards.length,
+      4,
       (i) => AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 550),
@@ -108,20 +62,69 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  // الكروت بتتبنى جوه build() عشان AppLocalizations محتاجة context
+  List<_CardData> _buildCards(BuildContext context) => [
+        _CardData(
+          heroTag: 'hero_start',
+          emoji: '🎙️',
+          title: AppLocalizations.of(context)!.cardStartTitle,
+          subtitle: AppLocalizations.of(context)!.cardStartSubtitle,
+          bgColor: const Color(0xFFFF6B6B),
+          accentColor: const Color(0xFFFF8E8E),
+          shadowColor: const Color(0xFFD94F4F),
+          stars: const [Color(0xFFFFD93D), Color(0xFFFFE98A)],
+          route: AppRoutes.modeSelect,
+        ),
+        _CardData(
+          heroTag: 'hero_recordings',
+          emoji: '🎵',
+          title: AppLocalizations.of(context)!.cardReportsTitle,
+          subtitle: AppLocalizations.of(context)!.cardReportsSubtitle,
+          bgColor: const Color(0xFF6BCB77),
+          accentColor: const Color(0xFF8EDA99),
+          shadowColor: const Color(0xFF4DA85A),
+          stars: const [Color(0xFFFFD93D), Color(0xFFFFA500)],
+          route: AppRoutes.recordings,
+        ),
+        _CardData(
+          heroTag: 'hero_profile',
+          emoji: '👶',
+          title: AppLocalizations.of(context)!.cardProfilesTitle,
+          subtitle: AppLocalizations.of(context)!.cardProfilesSubtitle,
+          bgColor: const Color(0xFF4D96FF),
+          accentColor: const Color(0xFF7AB3FF),
+          shadowColor: const Color(0xFF2B72D9),
+          stars: const [Color(0xFFFF6B9D), Color(0xFFFF9DC8)],
+          route: AppRoutes.profile,
+        ),
+        _CardData(
+          heroTag: 'hero_settings',
+          emoji: '⚙️',
+          title: AppLocalizations.of(context)!.cardOptionsTitle,
+          subtitle: AppLocalizations.of(context)!.cardOptionsSubtitle,
+          bgColor: const Color(0xFFFF9F1C),
+          accentColor: const Color(0xFFFFBB5C),
+          shadowColor: const Color(0xFFD97F00),
+          stars: const [Color(0xFF6BCB77), Color(0xFFA8EDBB)],
+          route: AppRoutes.settings,
+        ),
+      ];
+
   Future<String?> _pickProfileId() async {
     final profiles = LocalDb.getProfiles();
 
     if (profiles.isEmpty) {
-      // مفيش Profiles: نوديه لصفحة البروفايل
       if (!mounted) return null;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           behavior: SnackBarBehavior.floating,
           backgroundColor: const Color(0xFFFF6B6B),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          content: const Text(
-            'Create a profile first 👶',
-            style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          content: Text(
+            AppLocalizations.of(context)!.snackbarCreateProfileFirst,
+            style: const TextStyle(
+                fontWeight: FontWeight.w700, color: Colors.white),
           ),
         ),
       );
@@ -129,7 +132,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       return null;
     }
 
-    // لو فيه Active Profile جاهز نعرضه أول واحد
     final activeId = LocalDb.getActiveProfileId();
     ParentProfile? active =
         profiles.where((p) => p.id == activeId).isNotEmpty
@@ -139,24 +141,27 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return showDialog<String>(
       context: context,
       barrierDismissible: true,
-      builder: (_) {
+      builder: (dialogContext) {
         return Dialog(
           backgroundColor: const Color(0xFFFFF4E8),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('👶 Choose Profile',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      color: Color(0xFF3D3D3D),
-                    )),
+                Text(
+                  AppLocalizations.of(dialogContext)!.profilePickerTitle,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                    color: Color(0xFF3D3D3D),
+                  ),
+                ),
                 const SizedBox(height: 6),
                 Text(
-                  'Select who you will record for',
+                  AppLocalizations.of(dialogContext)!.profilePickerSubtitle,
                   style: TextStyle(
                     fontSize: 12.5,
                     color: Colors.grey.shade600,
@@ -165,11 +170,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
                 const SizedBox(height: 14),
 
-                // Active hint
                 if (active != null)
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
                       color: const Color(0xFF6BCB77).withOpacity(0.10),
                       borderRadius: BorderRadius.circular(14),
@@ -182,7 +186,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'Active: ${active.displayName}',
+                            '${AppLocalizations.of(dialogContext)!.profilePickerActivePrefix}${active.displayName}',
                             style: const TextStyle(
                               fontWeight: FontWeight.w800,
                               color: Color(0xFF3D3D3D),
@@ -202,11 +206,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     shrinkWrap: true,
                     itemCount: profiles.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 8),
-                    itemBuilder: (_, i) {
+                    itemBuilder: (listContext, i) {
                       final p = profiles[i];
                       final isActive = p.id == activeId;
                       return GestureDetector(
-                        onTap: () => Navigator.pop(context, p.id),
+                        onTap: () => Navigator.pop(dialogContext, p.id),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 14, vertical: 12),
@@ -257,7 +261,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      p.phone.isEmpty ? 'No phone' : p.phone,
+                                      p.phone.isEmpty
+                                          ? AppLocalizations.of(listContext)!.profilePickerNoPhone
+                                          : p.phone,
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: Colors.grey.shade600,
@@ -285,7 +291,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     Expanded(
                       child: GestureDetector(
                         onTap: () {
-                          Navigator.pop(context);
+                          Navigator.pop(dialogContext);
                           Navigator.pushNamed(context, AppRoutes.profile);
                         },
                         child: Container(
@@ -301,10 +307,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               ),
                             ],
                           ),
-                          child: const Center(
+                          child: Center(
                             child: Text(
-                              '➕ New Profile',
-                              style: TextStyle(
+                              AppLocalizations.of(dialogContext)!.profilePickerNewProfileBtn,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w900,
                               ),
@@ -316,17 +322,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     const SizedBox(width: 10),
                     Expanded(
                       child: GestureDetector(
-                        onTap: () => Navigator.pop(context, null),
+                        onTap: () => Navigator.pop(dialogContext, null),
                         child: Container(
                           height: 44,
                           decoration: BoxDecoration(
                             color: const Color(0xFFE8E0D5),
                             borderRadius: BorderRadius.circular(14),
                           ),
-                          child: const Center(
+                          child: Center(
                             child: Text(
-                              'Cancel',
-                              style: TextStyle(
+                              AppLocalizations.of(dialogContext)!.profilePickerCancelBtn,
+                              style: const TextStyle(
                                 color: Color(0xFF3D3D3D),
                                 fontWeight: FontWeight.w900,
                               ),
@@ -347,7 +353,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Future<void> _handleCardTap(_CardData card) async {
     if (card.route == AppRoutes.modeSelect) {
-      // Start: لازم نختار Profile
       final profileId = await _pickProfileId();
       if (profileId == null) return;
 
@@ -362,7 +367,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       return;
     }
 
-    // باقي الكروت طبيعي
     Navigator.pushNamed(
       context,
       card.route,
@@ -372,6 +376,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final cards = _buildCards(context);
     final width = MediaQuery.of(context).size.width;
     final crossAxisCount = width >= 900 ? 3 : 2;
 
@@ -399,10 +404,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           const _Dot(top: 160, left: 28, color: Color(0xFFFF6B6B), size: 10),
           const _Dot(top: 220, right: 22, color: Color(0xFF6BCB77), size: 8),
           const _Dot(top: 340, left: 14, color: Color(0xFF4D96FF), size: 12),
-          const _Dot(
-              bottom: 220, left: 18, color: Color(0xFFFF9F1C), size: 9),
-          const _Dot(
-              bottom: 160, right: 16, color: Color(0xFFFF6B6B), size: 7),
+          const _Dot(bottom: 220, left: 18, color: Color(0xFFFF9F1C), size: 9),
+          const _Dot(bottom: 160, right: 16, color: Color(0xFFFF6B6B), size: 7),
 
           SafeArea(
             child: Padding(
@@ -431,19 +434,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
                   RichText(
                     textAlign: TextAlign.center,
-                    text: const TextSpan(
+                    text: TextSpan(
                       children: [
                         TextSpan(
-                          text: 'Hello, ',
-                          style: TextStyle(
+                          text: AppLocalizations.of(context)!.homeGreeting,
+                          style: const TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w700,
                             color: Color(0xFF3D3D3D),
                           ),
                         ),
                         TextSpan(
-                          text: 'Little Star! ⭐',
-                          style: TextStyle(
+                          text: AppLocalizations.of(context)!.homeGreetingName,
+                          style: const TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w900,
                             color: Color(0xFFFF6B6B),
@@ -454,7 +457,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'What do you want to do today?',
+                    AppLocalizations.of(context)!.homeSubtitle,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 15,
@@ -468,23 +471,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   Expanded(
                     child: GridView.builder(
                       physics: const BouncingScrollPhysics(),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: crossAxisCount,
                         crossAxisSpacing: 14,
                         mainAxisSpacing: 14,
                         childAspectRatio: 0.92,
                       ),
-                      itemCount: _cards.length,
+                      itemCount: cards.length,
                       itemBuilder: (context, i) {
                         return FadeTransition(
                           opacity: _cardFades[i],
                           child: SlideTransition(
                             position: _cardSlides[i],
                             child: _KidsCard(
-                              data: _cards[i],
+                              data: cards[i],
                               floatController: _floatController,
                               floatPhaseOffset: i * 0.25,
-                              onTap: () => _handleCardTap(_cards[i]),
+                              onTap: () => _handleCardTap(cards[i]),
                             ),
                           ),
                         );
@@ -510,12 +514,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Text('💡', style: TextStyle(fontSize: 14)),
-                        SizedBox(width: 8),
+                      children: [
+                        const Text('💡', style: TextStyle(fontSize: 14)),
+                        const SizedBox(width: 8),
                         Text(
-                          'Set Max Level & Countdown in Options!',
-                          style: TextStyle(
+                          AppLocalizations.of(context)!.homeTip,
+                          style: const TextStyle(
                             color: Color(0xFF5A4000),
                             fontSize: 12.5,
                             fontWeight: FontWeight.w700,
@@ -535,6 +539,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 }
+
+// ══════════════════════════════════════════════════════════════
+// الكلاسات الثانوية — بدون تغيير
+// ══════════════════════════════════════════════════════════════
 
 class _KidsCard extends StatefulWidget {
   final _CardData data;
@@ -622,21 +630,19 @@ class _KidsCardState extends State<_KidsCard>
                   left: 0,
                   right: 0,
                   child: ClipRRect(
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(28)),
+                    borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(28)),
                     child: CustomPaint(
                       size: const Size(double.infinity, 56),
                       painter: _WavePainter(widget.data.accentColor),
                     ),
                   ),
                 ),
-
                 Positioned(
                   top: 10,
                   right: 12,
                   child: _Sparkle(colors: widget.data.stars),
                 ),
-
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                   child: Column(
@@ -660,9 +666,7 @@ class _KidsCardState extends State<_KidsCard>
                           ),
                         ),
                       ),
-
                       const Spacer(),
-
                       Text(
                         widget.data.title,
                         style: const TextStyle(
@@ -824,12 +828,12 @@ class _FallbackLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: const [
-        Text('🍼', style: TextStyle(fontSize: 30)),
-        SizedBox(width: 8),
+      children: [
+        const Text('🍼', style: TextStyle(fontSize: 30)),
+        const SizedBox(width: 8),
         Text(
-          'Speech Space',
-          style: TextStyle(
+          AppLocalizations.of(context)!.fallbackLogoAppName,
+          style: const TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.w900,
             color: Color(0xFFFF6B6B),

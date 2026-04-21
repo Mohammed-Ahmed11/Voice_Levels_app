@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../models/parent_profile.dart';
+import 'package:voice_levels_app/l10n/app_localizations.dart';
 import '../routes.dart';
 import '../services/local_db.dart';
 
@@ -11,8 +12,9 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateMixin {
-  final _name  = TextEditingController();
+class _ProfileScreenState extends State<ProfileScreen>
+    with TickerProviderStateMixin {
+  final _name = TextEditingController();
   final _phone = TextEditingController();
   final _child = TextEditingController();
   final _notes = TextEditingController();
@@ -31,13 +33,23 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
   void initState() {
     super.initState();
 
-    _bgFloat1 = AnimationController(vsync: this, duration: const Duration(milliseconds: 3200))..repeat(reverse: true);
-    _bgFloat2 = AnimationController(vsync: this, duration: const Duration(milliseconds: 2500))..repeat(reverse: true);
+    _bgFloat1 = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 3200),
+    )..repeat(reverse: true);
+    _bgFloat2 = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2500),
+    )..repeat(reverse: true);
 
-    _saveCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 120));
-    _saveScale = Tween<double>(begin: 1.0, end: 0.93).animate(
-      CurvedAnimation(parent: _saveCtrl, curve: Curves.easeOut),
+    _saveCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 120),
     );
+    _saveScale = Tween<double>(
+      begin: 1.0,
+      end: 0.93,
+    ).animate(CurvedAnimation(parent: _saveCtrl, curve: Curves.easeOut));
 
     _loadProfiles();
   }
@@ -48,17 +60,21 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
 
     setState(() {
       _profiles = profiles;
-      _selectedId = activeId ?? (profiles.isNotEmpty ? profiles.first.id : null);
+      _selectedId =
+          activeId ?? (profiles.isNotEmpty ? profiles.first.id : null);
     });
 
     if (_selectedId != null) {
-      final p = _profiles.firstWhere((e) => e.id == _selectedId, orElse: () => _profiles.first);
+      final p = _profiles.firstWhere(
+        (e) => e.id == _selectedId,
+        orElse: () => _profiles.first,
+      );
       _fillForm(p);
     }
   }
 
   void _fillForm(ParentProfile p) {
-    _name.text  = p.parentName;
+    _name.text = p.parentName;
     _phone.text = p.phone;
     _child.text = p.childName;
     _notes.text = p.notes;
@@ -117,7 +133,12 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
     final id = _selectedId;
     if (id == null) return;
 
-    final p = _profiles.firstWhere((e) => e.id == id, orElse: () => _profiles.first);
+    final p = _profiles.firstWhere(
+      (e) => e.id == id,
+      orElse: () => _profiles.first,
+    );
+
+    final t = AppLocalizations.of(context)!;
 
     final ok = await showDialog<bool>(
       context: context,
@@ -134,13 +155,21 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
               Text(
                 'Delete "${p.childName.isEmpty ? 'Patient' : p.childName}"?',
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF3D3D3D)),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF3D3D3D),
+                ),
               ),
               const SizedBox(height: 6),
               Text(
-                'This will delete this patient and their recordings.',
+                t.profileDeleteBody,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey.shade500,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               const SizedBox(height: 16),
               Row(
@@ -150,8 +179,19 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                       onTap: () => Navigator.pop(context, false),
                       child: Container(
                         height: 44,
-                        decoration: BoxDecoration(color: const Color(0xFFE8E0D5), borderRadius: BorderRadius.circular(14)),
-                        child: const Center(child: Text('Cancel', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF3D3D3D)))),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE8E0D5),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Center(
+                          child: Text(
+                            t.profileDeleteCancel,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF3D3D3D),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -164,9 +204,23 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                         decoration: BoxDecoration(
                           color: const Color(0xFFFF6B6B),
                           borderRadius: BorderRadius.circular(14),
-                          boxShadow: const [BoxShadow(color: Color(0xFFCC3333), blurRadius: 0, offset: Offset(0, 4))],
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0xFFCC3333),
+                              blurRadius: 0,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
                         ),
-                        child: const Center(child: Text('Delete', style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white))),
+                        child:  Center(
+                          child: Text(
+                            t.profileDeleteConfirm,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -198,15 +252,33 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFF4E8),
       resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
-          Positioned(top: -70, left: -50,  child: _Blob(color: const Color(0xFFD6ECFF), size: 250)),
-          Positioned(top: 80,  right: -60, child: _Blob(color: const Color(0xFFFFDFDF), size: 200)),
-          Positioned(bottom: 140, left: -50, child: _Blob(color: const Color(0xFFD6FFE4), size: 210)),
-          Positioned(bottom: -50, right: 0,  child: _Blob(color: const Color(0xFFFFF0C8), size: 180)),
+          Positioned(
+            top: -70,
+            left: -50,
+            child: _Blob(color: const Color(0xFFD6ECFF), size: 250),
+          ),
+          Positioned(
+            top: 80,
+            right: -60,
+            child: _Blob(color: const Color(0xFFFFDFDF), size: 200),
+          ),
+          Positioned(
+            bottom: 140,
+            left: -50,
+            child: _Blob(color: const Color(0xFFD6FFE4), size: 210),
+          ),
+          Positioned(
+            bottom: -50,
+            right: 0,
+            child: _Blob(color: const Color(0xFFFFF0C8), size: 180),
+          ),
 
           AnimatedBuilder(
             animation: _bgFloat1,
@@ -217,7 +289,10 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                 opacity: 0.13,
                 child: Transform.rotate(
                   angle: 0.20,
-                  child: CustomPaint(size: const Size(100, 100), painter: const _BearPainter(color: Color(0xFF4D96FF))),
+                  child: CustomPaint(
+                    size: const Size(100, 100),
+                    painter: const _BearPainter(color: Color(0xFF4D96FF)),
+                  ),
                 ),
               ),
             ),
@@ -231,7 +306,10 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                 opacity: 0.12,
                 child: Transform.rotate(
                   angle: -0.18,
-                  child: CustomPaint(size: const Size(90, 90), painter: const _BunnyPainter(color: Color(0xFF6BCB77))),
+                  child: CustomPaint(
+                    size: const Size(90, 90),
+                    painter: const _BunnyPainter(color: Color(0xFF6BCB77)),
+                  ),
                 ),
               ),
             ),
@@ -247,32 +325,53 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
                         child: Container(
-                          width: 46, height: 46,
+                          width: 46,
+                          height: 46,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(15),
-                            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 12, offset: const Offset(0, 4))],
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.08),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
-                          child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Color(0xFF3D3D3D)),
+                          child: const Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            size: 18,
+                            color: Color(0xFF3D3D3D),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 14),
                       const SizedBox(width: 10),
-                      const Text(
-                        'Patients',
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFF9C8AE6)),
+                      Text(
+                        t.profileTitle,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF9C8AE6),
+                        ),
                       ),
                       const Spacer(),
                       if (_selectedId != null)
                         GestureDetector(
                           onTap: _confirmDeleteCurrent,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xFFFF6B6B).withOpacity(0.12),
                               borderRadius: BorderRadius.circular(14),
                             ),
-                            child: const Text('🗑️', style: TextStyle(fontSize: 16)),
+                            child: const Text(
+                              '🗑️',
+                              style: TextStyle(fontSize: 16),
+                            ),
                           ),
                         ),
                     ],
@@ -283,8 +382,12 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
-                    'Create a profile for each patient so recordings don’t get mixed.',
-                    style: TextStyle(fontSize: 13, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
+                    t.profileSubtitle,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey.shade500,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
 
@@ -302,7 +405,9 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                             children: [
                               for (final p in _profiles) ...[
                                 _ProfileChip(
-                                  label: (p.childName.trim().isEmpty ? 'Patient' : p.childName.trim()),
+                                  label: (p.childName.trim().isEmpty
+                                      ? 'Patient'
+                                      : p.childName.trim()),
                                   selected: p.id == _selectedId,
                                   onTap: () => _selectProfile(p.id),
                                 ),
@@ -315,13 +420,25 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                       GestureDetector(
                         onTap: _addNewProfile,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFF9C8AE6),
                             borderRadius: BorderRadius.circular(18),
-                            boxShadow: const [BoxShadow(color: Color(0xFF6D5CC7), blurRadius: 0, offset: Offset(0, 4))],
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0xFF6D5CC7),
+                                blurRadius: 0,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
                           ),
-                          child: const Text('➕', style: TextStyle(fontSize: 16)),
+                          child: const Text(
+                            '➕',
+                            style: TextStyle(fontSize: 16),
+                          ),
                         ),
                       ),
                     ],
@@ -334,44 +451,50 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
                     children: [
-                      _SectionLabel(emoji: '👨‍👩‍👧', label: 'Parent Info'),
+                      _SectionLabel(
+                        emoji: '👨‍👩‍👧',
+                        label: t.profileParentSection,
+                      ),
                       const SizedBox(height: 10),
                       _KidsField(
                         controller: _name,
-                        label: 'Parent Name',
+                        label: t.profileParentName,
                         emoji: '🏷️',
-                        hint: 'e.g. Sarah',
+                        hint: t.profileParentNameHint,
                         color: const Color(0xFF4D96FF),
                         keyboardType: TextInputType.name,
                       ),
                       const SizedBox(height: 12),
                       _KidsField(
                         controller: _phone,
-                        label: 'Phone Number',
+                        label: t.profilePhone,
                         emoji: '📞',
-                        hint: 'e.g. +20 ...',
+                        hint: t.profilePhoneHint,
                         color: const Color(0xFF6BCB77),
                         keyboardType: TextInputType.phone,
                       ),
 
                       const SizedBox(height: 22),
 
-                      _SectionLabel(emoji: '👶', label: 'Patient Info'),
+                      _SectionLabel(
+                        emoji: '👶',
+                        label: t.profilePatientSection,
+                      ),
                       const SizedBox(height: 10),
                       _KidsField(
                         controller: _child,
-                        label: 'Patient Name',
+                        label: t.profilePatientName,
                         emoji: '🌟',
-                        hint: 'e.g. Lily',
+                        hint: t.profilePatientNameHint,
                         color: const Color(0xFFFF9F1C),
                         keyboardType: TextInputType.name,
                       ),
                       const SizedBox(height: 12),
                       _KidsField(
                         controller: _notes,
-                        label: 'Notes',
+                        label: t.profileNotes,
                         emoji: '📝',
-                        hint: 'Any extra info...',
+                        hint: t.profileNotesHint,
                         color: const Color(0xFFB66DFF),
                         maxLines: 3,
                       ),
@@ -380,25 +503,41 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
 
                       AnimatedBuilder(
                         animation: _saveScale,
-                        builder: (_, child) => Transform.scale(scale: _saveScale.value, child: child),
+                        builder: (_, child) => Transform.scale(
+                          scale: _saveScale.value,
+                          child: child,
+                        ),
                         child: GestureDetector(
                           onTapDown: (_) => _saveCtrl.forward(),
-                          onTapUp: (_) { _saveCtrl.reverse(); _save(); },
+                          onTapUp: (_) {
+                            _saveCtrl.reverse();
+                            _save();
+                          },
                           onTapCancel: () => _saveCtrl.reverse(),
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 300),
                             height: 58,
                             decoration: BoxDecoration(
-                              color: _saved ? const Color(0xFF6BCB77) : const Color(0xFFFF6B6B),
+                              color: _saved
+                                  ? const Color(0xFF6BCB77)
+                                  : const Color(0xFFFF6B6B),
                               borderRadius: BorderRadius.circular(22),
                               boxShadow: [
                                 BoxShadow(
-                                  color: (_saved ? const Color(0xFF3A9947) : const Color(0xFFCC3333)).withOpacity(0.55),
+                                  color:
+                                      (_saved
+                                              ? const Color(0xFF3A9947)
+                                              : const Color(0xFFCC3333))
+                                          .withOpacity(0.55),
                                   blurRadius: 0,
                                   offset: const Offset(0, 6),
                                 ),
                                 BoxShadow(
-                                  color: (_saved ? const Color(0xFF3A9947) : const Color(0xFFCC3333)).withOpacity(0.25),
+                                  color:
+                                      (_saved
+                                              ? const Color(0xFF3A9947)
+                                              : const Color(0xFFCC3333))
+                                          .withOpacity(0.25),
                                   blurRadius: 18,
                                   offset: const Offset(0, 12),
                                 ),
@@ -407,16 +546,29 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(_saved ? '✅' : '💾', style: const TextStyle(fontSize: 22)),
+                                Text(
+                                  _saved ? '✅' : '💾',
+                                  style: const TextStyle(fontSize: 22),
+                                ),
                                 const SizedBox(width: 10),
                                 Text(
-                                  _saved ? 'Saved!' : (_selectedId == null ? 'Create Patient' : 'Save Changes'),
+                                  _saved
+                                      ? t.profileSaved
+                                      : (_selectedId == null
+                                            ? t.profileCreate
+                                            : t.profileSave),
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 17,
                                     fontWeight: FontWeight.w900,
                                     letterSpacing: 0.2,
-                                    shadows: [Shadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 4)],
+                                    shadows: [
+                                      Shadow(
+                                        color: Colors.black26,
+                                        offset: Offset(0, 2),
+                                        blurRadius: 4,
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
@@ -448,7 +600,11 @@ class _ProfileChip extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  const _ProfileChip({required this.label, required this.selected, required this.onTap});
+  const _ProfileChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -460,10 +616,15 @@ class _ProfileChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected ? const Color(0xFF9C8AE6) : Colors.white,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: selected ? const Color(0xFF9C8AE6) : const Color(0xFFE8E0D5), width: 1.5),
+          border: Border.all(
+            color: selected ? const Color(0xFF9C8AE6) : const Color(0xFFE8E0D5),
+            width: 1.5,
+          ),
           boxShadow: [
             BoxShadow(
-              color: selected ? const Color(0xFF9C8AE6).withOpacity(0.25) : Colors.black.withOpacity(0.05),
+              color: selected
+                  ? const Color(0xFF9C8AE6).withOpacity(0.25)
+                  : Colors.black.withOpacity(0.05),
               blurRadius: 12,
               offset: const Offset(0, 5),
             ),
@@ -517,12 +678,17 @@ class _KidsFieldState extends State<_KidsField> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: _focused ? widget.color.withOpacity(0.35) : Colors.black.withOpacity(0.07),
+            color: _focused
+                ? widget.color.withOpacity(0.35)
+                : Colors.black.withOpacity(0.07),
             blurRadius: _focused ? 0 : 10,
             offset: _focused ? const Offset(0, 5) : const Offset(0, 3),
           ),
         ],
-        border: Border.all(color: _focused ? widget.color : Colors.transparent, width: _focused ? 2.5 : 0),
+        border: Border.all(
+          color: _focused ? widget.color : Colors.transparent,
+          width: _focused ? 2.5 : 0,
+        ),
       ),
       child: Focus(
         onFocusChange: (f) => setState(() => _focused = f),
@@ -530,10 +696,17 @@ class _KidsFieldState extends State<_KidsField> {
           controller: widget.controller,
           keyboardType: widget.keyboardType,
           maxLines: widget.maxLines,
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF2D2D2D)),
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF2D2D2D),
+          ),
           decoration: InputDecoration(
             hintText: widget.hint,
-            hintStyle: TextStyle(color: Colors.grey.shade400, fontWeight: FontWeight.w500),
+            hintStyle: TextStyle(
+              color: Colors.grey.shade400,
+              fontWeight: FontWeight.w500,
+            ),
             labelText: widget.label,
             labelStyle: TextStyle(
               color: _focused ? widget.color : Colors.grey.shade400,
@@ -544,9 +717,15 @@ class _KidsFieldState extends State<_KidsField> {
               padding: const EdgeInsets.only(left: 14, right: 8),
               child: Text(widget.emoji, style: const TextStyle(fontSize: 20)),
             ),
-            prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 0,
+              minHeight: 0,
+            ),
             border: InputBorder.none,
-            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: widget.maxLines > 1 ? 14 : 0),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: widget.maxLines > 1 ? 14 : 0,
+            ),
           ),
         ),
       ),
@@ -567,13 +746,21 @@ class _SectionLabel extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           label,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFF3D3D3D), letterSpacing: -0.2),
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w900,
+            color: Color(0xFF3D3D3D),
+            letterSpacing: -0.2,
+          ),
         ),
         const SizedBox(width: 10),
         Expanded(
           child: Container(
             height: 2,
-            decoration: BoxDecoration(color: const Color(0xFFE8E0D5), borderRadius: BorderRadius.circular(2)),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE8E0D5),
+              borderRadius: BorderRadius.circular(2),
+            ),
           ),
         ),
       ],
@@ -594,14 +781,38 @@ class _BottomBar extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF2D2D2D),
           borderRadius: BorderRadius.circular(28),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.18), blurRadius: 20, offset: const Offset(0, 8))],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.18),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _NavItem(emoji: '🏠', label: 'Home', onTap: () => Navigator.pushNamedAndRemoveUntil(screenContext, AppRoutes.home, (r) => false)),
-            _NavItem(emoji: '🎵', label: 'Records', onTap: () => Navigator.pushNamed(screenContext, AppRoutes.recordings)),
-            _NavItem(emoji: '⚙️', label: 'Options', onTap: () => Navigator.pushNamed(screenContext, AppRoutes.settings)),
+            _NavItem(
+              emoji: '🏠',
+              label: 'Home',
+              onTap: () => Navigator.pushNamedAndRemoveUntil(
+                screenContext,
+                AppRoutes.home,
+                (r) => false,
+              ),
+            ),
+            _NavItem(
+              emoji: '🎵',
+              label: 'Records',
+              onTap: () =>
+                  Navigator.pushNamed(screenContext, AppRoutes.recordings),
+            ),
+            _NavItem(
+              emoji: '⚙️',
+              label: 'Options',
+              onTap: () =>
+                  Navigator.pushNamed(screenContext, AppRoutes.settings),
+            ),
           ],
         ),
       ),
@@ -613,7 +824,11 @@ class _NavItem extends StatefulWidget {
   final String emoji;
   final String label;
   final VoidCallback onTap;
-  const _NavItem({required this.emoji, required this.label, required this.onTap});
+  const _NavItem({
+    required this.emoji,
+    required this.label,
+    required this.onTap,
+  });
 
   @override
   State<_NavItem> createState() => _NavItemState();
@@ -626,7 +841,10 @@ class _NavItemState extends State<_NavItem> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) { setState(() => _pressed = false); widget.onTap(); },
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
       onTapCancel: () => setState(() => _pressed = false),
       child: AnimatedScale(
         scale: _pressed ? 0.88 : 1.0,
@@ -634,7 +852,9 @@ class _NavItemState extends State<_NavItem> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 7),
           decoration: BoxDecoration(
-            color: _pressed ? Colors.white.withOpacity(0.12) : Colors.transparent,
+            color: _pressed
+                ? Colors.white.withOpacity(0.12)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(18),
           ),
           child: Column(
@@ -642,7 +862,14 @@ class _NavItemState extends State<_NavItem> {
             children: [
               Text(widget.emoji, style: const TextStyle(fontSize: 20)),
               const SizedBox(height: 3),
-              Text(widget.label, style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: Colors.white.withOpacity(0.85))),
+              Text(
+                widget.label,
+                style: TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white.withOpacity(0.85),
+                ),
+              ),
             ],
           ),
         ),
@@ -657,8 +884,14 @@ class _BearPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final p = Paint()..color = color..style = PaintingStyle.fill;
-    canvas.drawCircle(Offset(size.width * 0.5, size.height * 0.55), size.width * 0.34, p);
+    final p = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(
+      Offset(size.width * 0.5, size.height * 0.55),
+      size.width * 0.34,
+      p,
+    );
   }
 
   @override
@@ -671,8 +904,14 @@ class _BunnyPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final p = Paint()..color = color..style = PaintingStyle.fill;
-    canvas.drawCircle(Offset(size.width * 0.5, size.height * 0.55), size.width * 0.30, p);
+    final p = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(
+      Offset(size.width * 0.5, size.height * 0.55),
+      size.width * 0.30,
+      p,
+    );
   }
 
   @override
@@ -686,7 +925,8 @@ class _Blob extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    width: size, height: size,
+    width: size,
+    height: size,
     decoration: BoxDecoration(color: color, shape: BoxShape.circle),
   );
 }

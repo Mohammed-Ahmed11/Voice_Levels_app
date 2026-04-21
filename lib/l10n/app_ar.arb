@@ -1,0 +1,190 @@
+{
+  "homeGreeting": "مرحباً، ",
+  "homeGreetingName": "نجمنا الصغيرة! ⭐",
+  "homeSubtitle": "ماذا تريد أن تفعل اليوم؟",
+  "homeTip": "💡 اضبط المستوى الأقصى والعد التنازلي في الخيارات!",
+
+  "cardStartTitle": "ابدأ",
+  "cardStartSubtitle": "سجّل شيئاً ممتعاً!",
+
+  "cardReportsTitle": "التقارير",
+  "cardReportsSubtitle": "استمع وشارك!",
+
+  "cardProfilesTitle": "الملفات",
+  "cardProfilesSubtitle": "المرضى / الأطفال",
+
+  "cardOptionsTitle": "الخيارات",
+  "cardOptionsSubtitle": "إعدادات التطبيق",
+
+  "profilePickerTitle": "👶 اختر ملفاً",
+  "profilePickerSubtitle": "اختر لمن ستسجّل",
+  "profilePickerActivePrefix": "النشط: ",
+  "profilePickerNoPhone": "لا يوجد هاتف",
+  "profilePickerNewProfileBtn": "➕ ملف جديد",
+  "profilePickerCancelBtn": "إلغاء",
+
+  "snackbarCreateProfileFirst": "أنشئ ملفاً أولاً 👶",
+
+  "fallbackLogoAppName": "Speech Space",
+
+  "settingsTitle1": "خيارات ",
+  "settingsTitle2": "التطبيق",
+  "settingsSubtitle": "خصّص طريقة عمل التطبيق ⚙️",
+
+  "settingsSectionPermissions": "الأذونات",
+  "settingsSectionRecording": "التسجيل",
+  "settingsSectionLanguage": "اللغة",
+  "settingsSectionData": "البيانات",
+
+  "settingsMicTitle": "الميكروفون",
+  "settingsMicGranted": "مُفعَّل",
+  "settingsMicNotGranted": "غير مُفعَّل",
+  "settingsMicCheckBtn": "تحقق",
+
+  "settingsQualityTitle": "جودة التسجيل",
+  "settingsQualityHigh": "عالية",
+  "settingsQualityMedium": "متوسطة",
+  "settingsQualityLow": "منخفضة",
+
+  "settingsMaxLevelTitle": "المستوى الأقصى",
+  "settingsMaxLevelSubtitle": "{count} مستويات",
+  "@settingsMaxLevelSubtitle": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "settingsCountdownTitle": "العد التنازلي",
+  "settingsCountdownOff": "إيقاف",
+  "settingsCountdownSeconds": "{count} ثوانٍ",
+  "@settingsCountdownSeconds": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "settingsLangEnglishTitle": "English",
+  "settingsLangEnglishSubtitle": "التبديل للإنجليزية",
+  "settingsLangArabicTitle": "العربية",
+  "settingsLangArabicSubtitle": "التبديل للعربية",
+
+  "settingsProfileTitle": "الملف الشخصي",
+  "settingsProfileSubtitle": "معلومات الوالد والطفل",
+
+  "settingsResetTitle": "إعادة ضبط التطبيق",
+  "settingsResetSubtitle": "حذف الملف والتسجيلات والإعدادات",
+  "settingsResetBtn": "إعادة ضبط",
+
+  "settingsResetDialogTitle": "إعادة ضبط التطبيق؟",
+  "settingsResetDialogBody": "سيتم حذف ملفك الشخصي والتسجيلات وجميع الإعدادات.",
+  "settingsResetDialogCancel": "إلغاء",
+  "settingsResetDialogConfirm": "إعادة ضبط",
+  "settingsResetSuccess": "تمت إعادة ضبط التطبيق!",
+
+  "profileTitle": "المرضى",
+  "profileSubtitle": "أنشئ ملفًا لكل مريض حتى لا تختلط التسجيلات.",
+
+  "profileParentSection": "بيانات ولي الأمر",
+  "profileParentName": "اسم ولي الأمر",
+  "profileParentNameHint": "مثال: سارة",
+  "profilePhone": "رقم الهاتف",
+  "profilePhoneHint": "مثال: +20 ...",
+
+  "profilePatientSection": "بيانات المريض",
+  "profilePatientName": "اسم المريض",
+  "profilePatientNameHint": "مثال: ليلى",
+  "profileNotes": "ملاحظات",
+  "profileNotesHint": "أي معلومات إضافية...",
+
+  "profileDeleteTitle": "حذف \"{name}\"؟",
+  "profileDeleteBody": "سيتم حذف هذا المريض وجميع تسجيلاته.",
+  "profileDeleteCancel": "إلغاء",
+  "profileDeleteConfirm": "حذف",
+
+  "profileSave": "حفظ التعديلات",
+  "profileCreate": "إنشاء مريض",
+  "profileSaved": "تم الحفظ!"
+  ,
+  "profileDefaultPatient": "مريض {number}",
+  "@profileDefaultPatient": {
+    "placeholders": {
+      "number": { "type": "int" }
+    }
+  },
+
+  "patient": "المريض",
+  "reports": "التقارير",
+  "tapPatient": "اضغط على المريض لعرض التسجيلات 🎵",
+
+  "recording": "تسجيل",
+  "recordings": "تسجيلات",
+  "sessions": "جلسات",
+  "peak": "أعلى مستوى",
+
+  "deleteRecording": "حذف التسجيل؟",
+  "deleteRecordingConfirm": "سيتم حذف هذا التسجيل نهائيًا",
+  "cancel": "إلغاء",
+  "delete": "حذف",
+
+  "noPatients": "لا يوجد مرضى بعد",
+  "addPatientHint": "أضف ملف مريض أولاً 👨‍👩‍👧",
+  "addPatient": "إضافة مريض",
+
+  "noRecordingsFor": "لا توجد تسجيلات لـ",
+  "startSessionHint": "ابدأ جلسة لعرض النتائج هنا 🎙️",
+  "startRecording": "ابدأ التسجيل",
+
+  "mode": "الوضع",
+  "modeClassic": "كلاسيك",
+  "modeRounded": "دائري",
+  "modeThick": "سميك",
+  "modePlayful": "مرح",
+
+  "navHome": "الرئيسية",
+  "navRecords": "التسجيلات",
+  "navOptions": "الخيارات",
+
+  "modeSelectTitle1": "اختر ",
+  "modeSelectTitle2": "الوضع!",
+  "modeSelectSubtitle": "4 أشكال مختلفة للاختيار",
+
+  "modeClassicDesc": "مقياس مستوى بسيط",
+  "modeRoundedDesc": "مقياس دائري ناعم",
+  "modeThickDesc": "مستويات واضحة وعريضة",
+  "modePlayfulDesc": "واجهة ممتعة للأطفال",
+
+  "modeTagPopular": "الأشهر",
+  "modeTagSmooth": "ناعم",
+  "modeTagBold": "عريض",
+  "modeTagFun": "ممتع",
+
+  "modeTapToUse": "اضغط للاستخدام",
+
+  "zoneQuiet": "هادئ",
+  "zoneGood": "جيد",
+  "zoneLoud": "عالٍ",
+  "zoneMax": "الأقصى!",
+
+  "zoneDotQuietPlayful": "🐢 هادئ",
+  "zoneDotGoodPlayful": "🐥 جيد",
+  "zoneDotLoudPlayful": "🚀 عالٍ",
+  "zoneDotMaxPlayful": "🌟 الأقصى!",
+
+  "labelQuiet1": "هادئ...",
+  "labelLouder1": "يزداد الصوت!",
+  "labelGreat1": "أحسنت!",
+  "labelAmazing1": "رائع! 🎉",
+
+  "labelQuiet2": "بهدوء... 🤫",
+  "labelLouder2": "استمر!",
+  "labelLoud2": "عالٍ جداً! 🎉",
+  "labelAmazing2": "رائع!! 🌟",
+
+  "labelQuiet4": "هادئ جداً... 🤫",
+  "labelLouder4": "ارفع الصوت قليلاً! 😊",
+  "labelGetting4": "في الطريق! 🎵",
+  "labelKeep4": "نعم!! استمر! 🔥",
+  "labelIncredible4": "مذهل!! 🎊🎉",
+
+  "meterBars": "أشرطة"
+}

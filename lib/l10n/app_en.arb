@@ -1,0 +1,190 @@
+{
+  "homeGreeting": "Hello, ",
+  "homeGreetingName": "Little Star! ⭐",
+  "homeSubtitle": "What do you want to do today?",
+  "homeTip": "💡 Set Max Level & Countdown in Options!",
+
+  "cardStartTitle": "Start",
+  "cardStartSubtitle": "Record something fun!",
+
+  "cardReportsTitle": "Reports",
+  "cardReportsSubtitle": "Listen & share!",
+
+  "cardProfilesTitle": "Profiles",
+  "cardProfilesSubtitle": "Patients / kids",
+
+  "cardOptionsTitle": "Options",
+  "cardOptionsSubtitle": "App settings",
+
+  "profilePickerTitle": "👶 Choose Profile",
+  "profilePickerSubtitle": "Select who you will record for",
+  "profilePickerActivePrefix": "Active: ",
+  "profilePickerNoPhone": "No phone",
+  "profilePickerNewProfileBtn": "➕ New Profile",
+  "profilePickerCancelBtn": "Cancel",
+
+  "snackbarCreateProfileFirst": "Create a profile first 👶",
+
+  "fallbackLogoAppName": "Speech Space",
+
+  "settingsTitle1": "App ",
+  "settingsTitle2": "Options",
+  "settingsSubtitle": "Customize how the app works ⚙️",
+
+  "settingsSectionPermissions": "Permissions",
+  "settingsSectionRecording": "Recording",
+  "settingsSectionLanguage": "Language",
+  "settingsSectionData": "Data",
+
+  "settingsMicTitle": "Microphone",
+  "settingsMicGranted": "Granted",
+  "settingsMicNotGranted": "Not Granted",
+  "settingsMicCheckBtn": "Check",
+
+  "settingsQualityTitle": "Recording Quality",
+  "settingsQualityHigh": "High",
+  "settingsQualityMedium": "Medium",
+  "settingsQualityLow": "Low",
+
+  "settingsMaxLevelTitle": "Max Level",
+  "settingsMaxLevelSubtitle": "{count} levels",
+  "@settingsMaxLevelSubtitle": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "settingsCountdownTitle": "Countdown",
+  "settingsCountdownOff": "Off",
+  "settingsCountdownSeconds": "{count} seconds",
+  "@settingsCountdownSeconds": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "settingsLangEnglishTitle": "English",
+  "settingsLangEnglishSubtitle": "Switch to English",
+  "settingsLangArabicTitle": "العربية",
+  "settingsLangArabicSubtitle": "Switch to Arabic",
+
+  "settingsProfileTitle": "Go to Profile",
+  "settingsProfileSubtitle": "Parent & child info",
+
+  "settingsResetTitle": "Reset App Data",
+  "settingsResetSubtitle": "Delete profile, recordings & settings",
+  "settingsResetBtn": "Reset",
+
+  "settingsResetDialogTitle": "Reset App Data?",
+  "settingsResetDialogBody": "This will delete your profile, recordings, and all settings.",
+  "settingsResetDialogCancel": "Cancel",
+  "settingsResetDialogConfirm": "Reset",
+  "settingsResetSuccess": "App data reset!",
+
+  "profileTitle": "Patients",
+  "profileSubtitle": "Create a profile for each patient so recordings don’t get mixed.",
+
+  "profileParentSection": "Parent Info",
+  "profileParentName": "Parent Name",
+  "profileParentNameHint": "e.g. Sarah",
+  "profilePhone": "Phone Number",
+  "profilePhoneHint": "e.g. +20 ...",
+
+  "profilePatientSection": "Patient Info",
+  "profilePatientName": "Patient Name",
+  "profilePatientNameHint": "e.g. Lily",
+  "profileNotes": "Notes",
+  "profileNotesHint": "Any extra info...",
+
+  "profileDeleteTitle": "Delete \"{name}\"?",
+  "profileDeleteBody": "This will delete this patient and their recordings.",
+  "profileDeleteCancel": "Cancel",
+  "profileDeleteConfirm": "Delete",
+
+  "profileSave": "Save Changes",
+  "profileCreate": "Create Patient",
+  "profileSaved": "Saved!"
+  ,
+  "profileDefaultPatient": "Patient {number}",
+  "@profileDefaultPatient": {
+    "placeholders": {
+      "number": { "type": "int" }
+    }
+  },
+
+  "patient": "Patient",
+  "reports": "Reports",
+  "tapPatient": "Tap a patient to view their recordings 🎵",
+
+  "recording": "recording",
+  "recordings": "recordings",
+  "sessions": "sessions",
+  "peak": "Peak",
+
+  "deleteRecording": "Delete Recording?",
+  "deleteRecordingConfirm": "This recording will be permanently deleted.",
+  "cancel": "Cancel",
+  "delete": "Delete",
+
+  "noPatients": "No patients yet!",
+  "addPatientHint": "Add a patient profile first 👨‍👩‍👧",
+  "addPatient": "Add Patient",
+
+  "noRecordingsFor": "No recordings for",
+  "startSessionHint": "Start a session to see results here 🎙️",
+  "startRecording": "Start Recording",
+
+  "mode": "Mode",
+  "modeClassic": "Classic",
+  "modeRounded": "Rounded",
+  "modeThick": "Thick Meter",
+  "modePlayful": "Playful",
+
+  "navHome": "Home",
+  "navRecords": "Records",
+  "navOptions": "Options",
+
+  "modeSelectTitle1": "Pick a ",
+  "modeSelectTitle2": "Mode!",
+  "modeSelectSubtitle": "4 unique looks to choose from",
+
+  "modeClassicDesc": "Simple level meter",
+  "modeRoundedDesc": "Smooth rounded meter",
+  "modeThickDesc": "Bold & clear levels",
+  "modePlayfulDesc": "Fun child-friendly UI",
+
+  "modeTagPopular": "Popular",
+  "modeTagSmooth": "Smooth",
+  "modeTagBold": "Bold",
+  "modeTagFun": "Fun",
+
+  "modeTapToUse": "Tap to use",
+
+  "zoneQuiet": "Quiet",
+  "zoneGood": "Good",
+  "zoneLoud": "Loud",
+  "zoneMax": "Max!",
+
+  "zoneDotQuietPlayful": "🐢 Quiet",
+  "zoneDotGoodPlayful": "🐥 Good",
+  "zoneDotLoudPlayful": "🚀 Loud",
+  "zoneDotMaxPlayful": "🌟 Max!",
+
+  "labelQuiet1": "Quiet...",
+  "labelLouder1": "Getting louder!",
+  "labelGreat1": "Great job!",
+  "labelAmazing1": "AMAZING! 🎉",
+
+  "labelQuiet2": "Shhh... 🤫",
+  "labelLouder2": "Keep going!",
+  "labelLoud2": "So loud! 🎉",
+  "labelAmazing2": "AMAZING!! 🌟",
+
+  "labelQuiet4": "So quiet... 🤫",
+  "labelLouder4": "Little louder! 😊",
+  "labelGetting4": "Getting there! 🎵",
+  "labelKeep4": "Yes!! Keep going! 🔥",
+  "labelIncredible4": "INCREDIBLE!! 🎊🎉",
+
+  "meterBars": "bars"
+}

@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:voice_levels_app/l10n/app_localizations.dart';
 
 // ═══════════════════════════════════════════════════════════
 //  Mode 1 — Classic View (Kids Playful)
@@ -13,6 +14,7 @@ import 'package:flutter/material.dart';
 class Mode1ClassicView extends StatefulWidget {
   final double normalized;
   final Color accent;
+
   /// Max level ceiling from AppSettings (10 or 20).
   /// Used to label the percentage readout and zone thresholds.
   final int maxLevel;
@@ -32,8 +34,8 @@ class _Mode1ClassicViewState extends State<Mode1ClassicView>
     with TickerProviderStateMixin {
   // Mascot bounce when level is high
   late final AnimationController _bounceCtrl;
-  late final AnimationController _starCtrl;   // rotating stars
-  late final AnimationController _pulseCtrl;  // glow pulse
+  late final AnimationController _starCtrl; // rotating stars
+  late final AnimationController _pulseCtrl; // glow pulse
 
   // Remember previous normalized to detect big jumps (cheer effect)
   double _prevNormalized = 0;
@@ -94,23 +96,26 @@ class _Mode1ClassicViewState extends State<Mode1ClassicView>
     return '🤩';
   }
 
-  String _levelLabel(double n) {
-    if (n < 0.25) return 'Quiet...';
-    if (n < 0.50) return 'Getting louder!';
-    if (n < 0.75) return 'Great job!';
-    return 'AMAZING! 🎉';
+  // ✅ استخدام AppLocalizations بدل الـ hardcoded strings
+  String _levelLabel(double n, AppLocalizations l10n) {
+    if (n < 0.25) return l10n.labelQuiet1;
+    if (n < 0.50) return l10n.labelLouder1;
+    if (n < 0.75) return l10n.labelGreat1;
+    return l10n.labelAmazing1;
   }
 
   @override
   Widget build(BuildContext context) {
-    final n     = widget.normalized.clamp(0.0, 1.0);
+    // ✅ جلب الـ localizations مرة واحدة في البداية
+    final l10n = AppLocalizations.of(context)!;
+
+    final n = widget.normalized.clamp(0.0, 1.0);
     final color = _zoneColor(n);
-    final w     = MediaQuery.of(context).size.width - 32; // minus padding
+    final w = MediaQuery.of(context).size.width - 32; // minus padding
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-
         // ── Mascot + stars ──
         SizedBox(
           height: 100,
@@ -138,7 +143,8 @@ class _Mode1ClassicViewState extends State<Mode1ClassicView>
                 animation: _bounceCtrl,
                 builder: (_, child) {
                   final dy = -sin(_bounceCtrl.value * pi) * 14;
-                  return Transform.translate(offset: Offset(0, dy), child: child);
+                  return Transform.translate(
+                      offset: Offset(0, dy), child: child);
                 },
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
@@ -159,15 +165,18 @@ class _Mode1ClassicViewState extends State<Mode1ClassicView>
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 250),
           child: Text(
-            _levelLabel(n),
-            key: ValueKey(_levelLabel(n)),
+            _levelLabel(n, l10n),
+            key: ValueKey(_levelLabel(n, l10n)),
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w900,
               color: color,
               letterSpacing: -0.3,
               shadows: [
-                Shadow(color: color.withOpacity(0.35), offset: const Offset(0, 2), blurRadius: 6),
+                Shadow(
+                    color: color.withOpacity(0.35),
+                    offset: const Offset(0, 2),
+                    blurRadius: 6),
               ],
             ),
           ),
@@ -182,7 +191,8 @@ class _Mode1ClassicViewState extends State<Mode1ClassicView>
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.18),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.30), width: 1.5),
+            border: Border.all(
+                color: Colors.white.withOpacity(0.30), width: 1.5),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.12),
@@ -276,13 +286,26 @@ class _Mode1ClassicViewState extends State<Mode1ClassicView>
         // ── Segmented zone indicators ──
         Row(
           children: [
-            _ZoneDot(label: 'Quiet', color: const Color(0xFF6BCB77), active: n >= 0.05),
+            // ✅ النصوص جاية من الـ ARB
+            _ZoneDot(
+                label: l10n.zoneQuiet,
+                color: const Color(0xFF6BCB77),
+                active: n >= 0.05),
             const SizedBox(width: 6),
-            _ZoneDot(label: 'Good',   color: const Color(0xFFFFD93D), active: n >= 0.40),
+            _ZoneDot(
+                label: l10n.zoneGood,
+                color: const Color(0xFFFFD93D),
+                active: n >= 0.40),
             const SizedBox(width: 6),
-            _ZoneDot(label: 'Loud',   color: const Color(0xFFFF9F1C), active: n >= 0.65),
+            _ZoneDot(
+                label: l10n.zoneLoud,
+                color: const Color(0xFFFF9F1C),
+                active: n >= 0.65),
             const SizedBox(width: 6),
-            _ZoneDot(label: 'Max!',   color: const Color(0xFFFF6B6B), active: n >= 0.85),
+            _ZoneDot(
+                label: l10n.zoneMax,
+                color: const Color(0xFFFF6B6B),
+                active: n >= 0.85),
           ],
         ),
 
@@ -296,13 +319,20 @@ class _Mode1ClassicViewState extends State<Mode1ClassicView>
             return Transform.scale(
               scale: scale,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
                 decoration: BoxDecoration(
                   color: color,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
-                    BoxShadow(color: color, blurRadius: 0, offset: const Offset(0, 4)),
-                    BoxShadow(color: color.withOpacity(0.30), blurRadius: 14, offset: const Offset(0, 8)),
+                    BoxShadow(
+                        color: color,
+                        blurRadius: 0,
+                        offset: const Offset(0, 4)),
+                    BoxShadow(
+                        color: color.withOpacity(0.30),
+                        blurRadius: 14,
+                        offset: const Offset(0, 8)),
                   ],
                 ),
                 child: Row(
@@ -316,7 +346,12 @@ class _Mode1ClassicViewState extends State<Mode1ClassicView>
                         color: Colors.white,
                         fontWeight: FontWeight.w900,
                         fontSize: 26,
-                        shadows: [Shadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 4)],
+                        shadows: [
+                          Shadow(
+                              color: Colors.black26,
+                              offset: Offset(0, 2),
+                              blurRadius: 4)
+                        ],
                       ),
                     ),
                     Text(
@@ -347,7 +382,8 @@ class _ZoneDot extends StatelessWidget {
   final Color color;
   final bool active;
 
-  const _ZoneDot({required this.label, required this.color, required this.active});
+  const _ZoneDot(
+      {required this.label, required this.color, required this.active});
 
   @override
   Widget build(BuildContext context) {
@@ -356,10 +392,13 @@ class _ZoneDot extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 6),
         decoration: BoxDecoration(
-          color: active ? color.withOpacity(0.18) : Colors.white.withOpacity(0.08),
+          color:
+              active ? color.withOpacity(0.18) : Colors.white.withOpacity(0.08),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: active ? color.withOpacity(0.55) : Colors.white.withOpacity(0.15),
+            color: active
+                ? color.withOpacity(0.55)
+                : Colors.white.withOpacity(0.15),
             width: 1.5,
           ),
         ),
@@ -368,7 +407,8 @@ class _ZoneDot extends StatelessWidget {
           children: [
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              width: 8, height: 8,
+              width: 8,
+              height: 8,
               decoration: BoxDecoration(
                 color: active ? color : Colors.white.withOpacity(0.25),
                 shape: BoxShape.circle,
@@ -430,10 +470,13 @@ class _StarOrbitPainter extends CustomPainter {
     const points = 4;
     for (int i = 0; i < points * 2; i++) {
       final radius = i.isEven ? r : r * 0.45;
-      final angle  = (i * pi / points) - pi / 2;
+      final angle = (i * pi / points) - pi / 2;
       final x = center.dx + radius * cos(angle);
       final y = center.dy + radius * sin(angle);
-      if (i == 0) path.moveTo(x, y); else path.lineTo(x, y);
+      if (i == 0)
+        path.moveTo(x, y);
+      else
+        path.lineTo(x, y);
     }
     path.close();
     canvas.drawPath(path, paint);

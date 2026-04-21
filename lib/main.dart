@@ -10,5 +10,9 @@ Future<void> main() async {
   await Hive.initFlutter();
   await LocalDb.init();
 
-  runApp(const MyApp());
+  final controller = LocaleController(); // 👈 New
+
+  runApp(MyApp(controller: controller)); // 👈 Important
+
+  // runApp(const MyApp());
 }

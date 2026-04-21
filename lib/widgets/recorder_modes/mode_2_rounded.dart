@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:voice_levels_app/l10n/app_localizations.dart';
 
 // ═══════════════════════════════════════════════════════════
 //  Mode 2 — Rounded View (Kids Playful)
@@ -70,18 +71,21 @@ class _Mode2RoundedViewState extends State<Mode2RoundedView>
     return '🤩';
   }
 
-  String _label(double n) {
-    if (n < 0.25) return 'Shhh... 🤫';
-    if (n < 0.50) return 'Keep going!';
-    if (n < 0.75) return 'So loud! 🎉';
-    return 'AMAZING!! 🌟';
-  }
+  String _label(BuildContext context, double n) {
+  final t = AppLocalizations.of(context)!;
+
+  if (n < 0.25) return t.labelQuiet2;
+  if (n < 0.50) return t.labelLouder2;
+  if (n < 0.75) return t.labelLoud2;
+  return t.labelAmazing2;
+}
 
   @override
   Widget build(BuildContext context) {
     final n     = widget.normalized.clamp(0.0, 1.0);
     final color = _zoneColor(n);
     final cSize = 130.0 + n * 90.0;
+    final t = AppLocalizations.of(context)!;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -89,7 +93,7 @@ class _Mode2RoundedViewState extends State<Mode2RoundedView>
         // Label
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 250),
-          child: Text(_label(n), key: ValueKey(_label(n)),
+          child: Text(_label(context, n), key: ValueKey(_label(context, n)),
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: color,
               shadows: [Shadow(color: color.withOpacity(0.35), offset: const Offset(0, 2), blurRadius: 8)])),
         ),
@@ -264,13 +268,13 @@ class _Mode2RoundedViewState extends State<Mode2RoundedView>
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _ZoneDot(label: 'Quiet', color: const Color(0xFF6BCB77), active: n >= 0.05),
+            _ZoneDot(label: t.zoneDotQuietPlayful, color: const Color(0xFF6BCB77), active: n >= 0.05),
             const SizedBox(width: 8),
-            _ZoneDot(label: 'Good',  color: const Color(0xFFFFD93D), active: n >= 0.40),
+            _ZoneDot(label: t.zoneGood,  color: const Color(0xFFFFD93D), active: n >= 0.40),
             const SizedBox(width: 8),
-            _ZoneDot(label: 'Loud',  color: const Color(0xFFFF9F1C), active: n >= 0.65),
+            _ZoneDot(label: t.zoneLoud,  color: const Color(0xFFFF9F1C), active: n >= 0.65),
             const SizedBox(width: 8),
-            _ZoneDot(label: 'Max!',  color: const Color(0xFFFF6B6B), active: n >= 0.85),
+            _ZoneDot(label: t.zoneMax,   color: const Color(0xFFFF6B6B), active: n >= 0.85),
           ],
         ),
       ],

@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:voice_levels_app/app.dart';
+import 'package:voice_levels_app/l10n/app_localizations.dart';
 
 import '../models/app_settings.dart';
 import '../routes.dart';
@@ -61,6 +63,7 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
 
   Future<void> _resetConfirm() async {
+    final l10n = AppLocalizations.of(context)!;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => Dialog(
@@ -73,14 +76,14 @@ class _SettingsScreenState extends State<SettingsScreen>
             children: [
               const Text('🗑️', style: TextStyle(fontSize: 48)),
               const SizedBox(height: 12),
-              const Text(
-                'Reset App Data?',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF3D3D3D)),
+              Text(
+                l10n.settingsResetDialogTitle,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF3D3D3D)),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
-                'This will delete your profile, recordings, and all settings.',
+                l10n.settingsResetDialogBody,
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 13.5, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
               ),
@@ -96,8 +99,9 @@ class _SettingsScreenState extends State<SettingsScreen>
                           color: const Color(0xFFE8E0D5),
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: const Center(
-                          child: Text('Cancel', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF3D3D3D))),
+                        child: Center(
+                          child: Text(l10n.settingsResetDialogCancel,
+                              style: const TextStyle(fontWeight: FontWeight.w800, color: Color(0xFF3D3D3D))),
                         ),
                       ),
                     ),
@@ -115,8 +119,9 @@ class _SettingsScreenState extends State<SettingsScreen>
                             BoxShadow(color: const Color(0xFFCC3333), blurRadius: 0, offset: const Offset(0, 4)),
                           ],
                         ),
-                        child: const Center(
-                          child: Text('Reset', style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white)),
+                        child: Center(
+                          child: Text(l10n.settingsResetDialogConfirm,
+                              style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white)),
                         ),
                       ),
                     ),
@@ -151,11 +156,12 @@ class _SettingsScreenState extends State<SettingsScreen>
         behavior: SnackBarBehavior.floating,
         backgroundColor: const Color(0xFF6BCB77),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        content: const Row(
+        content: Row(
           children: [
-            Text('✅', style: TextStyle(fontSize: 18)),
-            SizedBox(width: 10),
-            Text('App data reset!', style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white)),
+            const Text('✅', style: TextStyle(fontSize: 18)),
+            const SizedBox(width: 10),
+            Text(l10n.settingsResetSuccess,
+                style: const TextStyle(fontWeight: FontWeight.w700, color: Colors.white)),
           ],
         ),
       ),
@@ -164,6 +170,7 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final args = ModalRoute.of(context)?.settings.arguments;
     final heroTag = (args is Map && args['heroTag'] != null)
         ? args['heroTag'].toString()
@@ -175,7 +182,7 @@ class _SettingsScreenState extends State<SettingsScreen>
       body: Stack(
         children: [
           // ── Pastel blobs ──
-          Positioned(top: -70,   left: -50,  child: _Blob(color: const Color(0xFFFFE4D6), size: 240)),
+          Positioned(top: -70,    left: -50, child: _Blob(color: const Color(0xFFFFE4D6), size: 240)),
           Positioned(top: 100,   right: -60, child: _Blob(color: const Color(0xFFD6ECFF), size: 200)),
           Positioned(bottom: 140, left: -50, child: _Blob(color: const Color(0xFFD6FFE4), size: 200)),
           Positioned(bottom: -50, right: 0,  child: _Blob(color: const Color(0xFFFFF0C8), size: 180)),
@@ -240,27 +247,16 @@ class _SettingsScreenState extends State<SettingsScreen>
                         ),
                       ),
                       const SizedBox(width: 14),
-                      // AnimatedBuilder(
-                      //   animation: _floatCtrl,
-                      //   builder: (_, child) => Transform.translate(
-                      //     offset: Offset(0, sin(_floatCtrl.value * pi) * 5),
-                      //     child: child,
-                      //   ),
-                      //   child: CustomPaint(
-                      //     size: const Size(46, 46),
-                      //     painter: const _CatPainter(color: Color(0xFFB66DFF)),
-                      //   ),
-                      // ),
                       const SizedBox(width: 10),
                       RichText(
-                        text: const TextSpan(children: [
+                        text: TextSpan(children: [
                           TextSpan(
-                            text: 'App ',
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Color(0xFF3D3D3D)),
+                            text: l10n.settingsTitle1,
+                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Color(0xFF3D3D3D)),
                           ),
                           TextSpan(
-                            text: 'Options',
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFF9C8AE6)),
+                            text: l10n.settingsTitle2,
+                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFF9C8AE6)),
                           ),
                         ]),
                       ),
@@ -272,7 +268,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
-                    'Customize how the app works ⚙️',
+                    l10n.settingsSubtitle,
                     style: TextStyle(fontSize: 13, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
                   ),
                 ),
@@ -284,7 +280,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
                     children: [
                       // ── Permissions ──
-                      _SectionLabel(emoji: '🎤', label: 'Permissions'),
+                      _SectionLabel(emoji: '🎤', label: l10n.settingsSectionPermissions),
                       const SizedBox(height: 10),
                       _SettingCard(
                         children: [
@@ -298,22 +294,22 @@ class _SettingsScreenState extends State<SettingsScreen>
                       const SizedBox(height: 20),
 
                       // ── Recording ──
-                      _SectionLabel(emoji: '🎙️', label: 'Recording'),
+                      _SectionLabel(emoji: '🎙️', label: l10n.settingsSectionRecording),
                       const SizedBox(height: 10),
                       _SettingCard(
                         children: [
                           _OptionTile(
                             emoji: '✨',
-                            title: 'Recording Quality',
+                            title: l10n.settingsQualityTitle,
                             subtitle: _settings.recordingQuality.toUpperCase(),
                             accentColor: const Color(0xFF4D96FF),
                             trailing: _KidsDropdown<String>(
                               value: _settings.recordingQuality,
                               accentColor: const Color(0xFF4D96FF),
-                              items: const [
-                                DropdownMenuItem(value: 'high',   child: Text('High')),
-                                DropdownMenuItem(value: 'medium', child: Text('Medium')),
-                                DropdownMenuItem(value: 'low',    child: Text('Low')),
+                              items: [
+                                DropdownMenuItem(value: 'high',   child: Text(l10n.settingsQualityHigh)),
+                                DropdownMenuItem(value: 'medium', child: Text(l10n.settingsQualityMedium)),
+                                DropdownMenuItem(value: 'low',    child: Text(l10n.settingsQualityLow)),
                               ],
                               onChanged: (v) {
                                 if (v == null) return;
@@ -324,8 +320,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                           _Divider(),
                           _OptionTile(
                             emoji: '📊',
-                            title: 'Max Level',
-                            subtitle: '${_settings.maxLevel} levels',
+                            title: l10n.settingsMaxLevelTitle,
+                            subtitle: l10n.settingsMaxLevelSubtitle(_settings.maxLevel),
                             accentColor: const Color(0xFF6BCB77),
                             trailing: _KidsDropdown<int>(
                               value: _settings.maxLevel,
@@ -343,18 +339,18 @@ class _SettingsScreenState extends State<SettingsScreen>
                           _Divider(),
                           _OptionTile(
                             emoji: '⏱️',
-                            title: 'Countdown',
+                            title: l10n.settingsCountdownTitle,
                             subtitle: _settings.countdownSeconds == 0
-                                ? 'Off'
-                                : '${_settings.countdownSeconds} seconds',
+                                ? l10n.settingsCountdownOff
+                                : l10n.settingsCountdownSeconds(_settings.countdownSeconds),
                             accentColor: const Color(0xFFFF9F1C),
                             trailing: _KidsDropdown<int>(
                               value: _settings.countdownSeconds,
                               accentColor: const Color(0xFFFF9F1C),
-                              items: const [
-                                DropdownMenuItem(value: 0, child: Text('Off')),
-                                DropdownMenuItem(value: 3, child: Text('3s')),
-                                DropdownMenuItem(value: 5, child: Text('5s')),
+                              items: [
+                                DropdownMenuItem(value: 0, child: Text(l10n.settingsCountdownOff)),
+                                const DropdownMenuItem(value: 3, child: Text('3s')),
+                                const DropdownMenuItem(value: 5, child: Text('5s')),
                               ],
                               onChanged: (v) {
                                 if (v == null) return;
@@ -367,15 +363,46 @@ class _SettingsScreenState extends State<SettingsScreen>
 
                       const SizedBox(height: 20),
 
+                      // ── Language ──
+                      _SectionLabel(emoji: '🌍', label: l10n.settingsSectionLanguage),
+                      const SizedBox(height: 10),
+                      _SettingCard(
+                        children: [
+                          _OptionTile(
+                            emoji: '🇬🇧',
+                            title: l10n.settingsLangEnglishTitle,
+                            subtitle: l10n.settingsLangEnglishSubtitle,
+                            accentColor: const Color(0xFF4D96FF),
+                            onTap: () {
+                              final controller = (context.findAncestorWidgetOfExactType<MyApp>() as MyApp).controller;
+                              controller.changeLocale('en');
+                            },
+                          ),
+                          _Divider(),
+                          _OptionTile(
+                            emoji: '🇪🇬',
+                            title: l10n.settingsLangArabicTitle,
+                            subtitle: l10n.settingsLangArabicSubtitle,
+                            accentColor: const Color(0xFF6BCB77),
+                            onTap: () {
+                              final controller = (context.findAncestorWidgetOfExactType<MyApp>() as MyApp).controller;
+                              controller.changeLocale('ar');
+                            },
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 20),
+
                       // ── Data ──
-                      _SectionLabel(emoji: '🗂️', label: 'Data'),
+                      _SectionLabel(emoji: '🗂️', label: l10n.settingsSectionData),
                       const SizedBox(height: 10),
                       _SettingCard(
                         children: [
                           _OptionTile(
                             emoji: '👤',
-                            title: 'Go to Profile',
-                            subtitle: 'Parent & child info',
+                            title: l10n.settingsProfileTitle,
+                            subtitle: l10n.settingsProfileSubtitle,
                             accentColor: const Color(0xFF4D96FF),
                             trailing: Container(
                               width: 32, height: 32,
@@ -420,6 +447,7 @@ class _MicTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final color = granted ? const Color(0xFF6BCB77) : const Color(0xFFFF6B6B);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -438,8 +466,8 @@ class _MicTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Microphone',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF2D2D2D))),
+                Text(l10n.settingsMicTitle,
+                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF2D2D2D))),
                 const SizedBox(height: 2),
                 Row(
                   children: [
@@ -449,7 +477,7 @@ class _MicTile extends StatelessWidget {
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      granted ? 'Granted' : 'Not Granted',
+                      granted ? l10n.settingsMicGranted : l10n.settingsMicNotGranted,
                       style: TextStyle(fontSize: 12.5, color: color, fontWeight: FontWeight.w700),
                     ),
                   ],
@@ -472,8 +500,8 @@ class _MicTile extends StatelessWidget {
                   ),
                 ],
               ),
-              child: const Text('Check',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13)),
+              child: Text(l10n.settingsMicCheckBtn,
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13)),
             ),
           ),
         ],
@@ -561,6 +589,7 @@ class _ResetTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(
@@ -578,10 +607,10 @@ class _ResetTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Reset App Data',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF2D2D2D))),
+                Text(l10n.settingsResetTitle,
+                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF2D2D2D))),
                 const SizedBox(height: 2),
-                Text('Delete profile, recordings & settings',
+                Text(l10n.settingsResetSubtitle,
                     style: TextStyle(fontSize: 12, color: Colors.grey.shade500, fontWeight: FontWeight.w600)),
               ],
             ),
@@ -597,8 +626,8 @@ class _ResetTile extends StatelessWidget {
                   BoxShadow(color: Color(0xFFCC3333), blurRadius: 0, offset: Offset(0, 4)),
                 ],
               ),
-              child: const Text('Reset',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13)),
+              child: Text(l10n.settingsResetBtn,
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13)),
             ),
           ),
         ],
@@ -727,6 +756,7 @@ class _BottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext ctx) {
+    final l10n = AppLocalizations.of(ctx)!;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
@@ -741,12 +771,25 @@ class _BottomBar extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _NavItem(emoji: '🏠', label: 'Home',
-                onTap: () => Navigator.pushNamedAndRemoveUntil(
-                    screenContext, AppRoutes.home, (r) => false)),
-            _NavItem(emoji: '🎵', label: 'Records',
-                onTap: () => Navigator.pushNamed(screenContext, AppRoutes.recordings)),
-            _NavItem(emoji: '⚙️', label: 'Options', onTap: () {}), // current screen
+            _NavItem(
+              emoji: '🏠',
+              label: l10n.navHome,
+              isCurrent: false,
+              onTap: () => Navigator.pushNamedAndRemoveUntil(
+                  screenContext, AppRoutes.home, (r) => false),
+            ),
+            _NavItem(
+              emoji: '🎵',
+              label: l10n.navRecords,
+              isCurrent: false,
+              onTap: () => Navigator.pushNamed(screenContext, AppRoutes.recordings),
+            ),
+            _NavItem(
+              emoji: '⚙️',
+              label: l10n.navOptions,
+              isCurrent: true,
+              onTap: () {},
+            ),
           ],
         ),
       ),
@@ -757,8 +800,14 @@ class _BottomBar extends StatelessWidget {
 class _NavItem extends StatefulWidget {
   final String emoji;
   final String label;
+  final bool isCurrent;
   final VoidCallback onTap;
-  const _NavItem({required this.emoji, required this.label, required this.onTap});
+  const _NavItem({
+    required this.emoji,
+    required this.label,
+    required this.isCurrent,
+    required this.onTap,
+  });
 
   @override
   State<_NavItem> createState() => _NavItemState();
@@ -769,7 +818,6 @@ class _NavItemState extends State<_NavItem> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isCurrent = widget.label == 'Options';
     return GestureDetector(
       onTapDown: (_) => setState(() => _pressed = true),
       onTapUp: (_) { setState(() => _pressed = false); widget.onTap(); },
@@ -780,11 +828,11 @@ class _NavItemState extends State<_NavItem> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 7),
           decoration: BoxDecoration(
-            color: isCurrent
+            color: widget.isCurrent
                 ? Colors.white.withOpacity(0.16)
                 : (_pressed ? Colors.white.withOpacity(0.10) : Colors.transparent),
             borderRadius: BorderRadius.circular(18),
-            border: isCurrent
+            border: widget.isCurrent
                 ? Border.all(color: Colors.white.withOpacity(0.25), width: 1)
                 : null,
           ),
@@ -797,7 +845,7 @@ class _NavItemState extends State<_NavItem> {
                   style: TextStyle(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w700,
-                    color: isCurrent ? Colors.white : Colors.white.withOpacity(0.70),
+                    color: widget.isCurrent ? Colors.white : Colors.white.withOpacity(0.70),
                   )),
             ],
           ),

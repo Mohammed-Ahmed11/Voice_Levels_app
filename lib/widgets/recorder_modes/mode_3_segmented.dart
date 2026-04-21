@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:voice_levels_app/l10n/app_localizations.dart';
 
 // ═══════════════════════════════════════════════════════════
 //  Mode 3 — Segmented View (Kids Playful)
@@ -78,17 +79,18 @@ class _Mode3SegmentedViewState extends State<Mode3SegmentedView>
     return '🤩';
   }
 
-  String _label(double n) {
-    if (n < 0.25) return 'Quiet...';
-    if (n < 0.50) return 'Getting louder!';
-    if (n < 0.75) return 'Great job! 🎉';
-    return 'AMAZING!! 🌟';
+  String _label(BuildContext context, double n) {
+    final l = AppLocalizations.of(context)!;
+    if (n < 0.25) return l.labelQuiet1;
+    if (n < 0.50) return l.labelLouder1;
+    if (n < 0.75) return l.labelGreat1;
+    return l.labelAmazing1;
   }
 
   @override
   Widget build(BuildContext context) {
+    final l      = AppLocalizations.of(context)!;
     final n      = widget.normalized.clamp(0.0, 1.0);
-    // Use maxLevel as the effective segment count ceiling
     final segCount = widget.maxLevel;
     final active = (n * segCount).clamp(0, segCount).toInt();
     final color  = _zoneColor(n);
@@ -130,7 +132,7 @@ class _Mode3SegmentedViewState extends State<Mode3SegmentedView>
         // ── Label ──
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 250),
-          child: Text(_label(n), key: ValueKey(_label(n)),
+          child: Text(_label(context, n), key: ValueKey(_label(context, n)),
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: color,
               shadows: [Shadow(color: color.withOpacity(0.35), offset: const Offset(0, 2), blurRadius: 6)])),
         ),
@@ -227,7 +229,7 @@ class _Mode3SegmentedViewState extends State<Mode3SegmentedView>
                     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 20,
                       shadows: [Shadow(color: Colors.black26, offset: Offset(0, 2), blurRadius: 4)])),
                   const SizedBox(width: 8),
-                  Text('bars', style: TextStyle(color: Colors.white.withOpacity(0.75), fontWeight: FontWeight.w700, fontSize: 14)),
+                  Text(l.meterBars, style: TextStyle(color: Colors.white.withOpacity(0.75), fontWeight: FontWeight.w700, fontSize: 14)),
                 ],
               ),
             ),
@@ -240,13 +242,13 @@ class _Mode3SegmentedViewState extends State<Mode3SegmentedView>
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _ZoneDot(label: 'Quiet', color: const Color(0xFF6BCB77), active: n >= 0.05),
+            _ZoneDot(label: l.zoneQuiet, color: const Color(0xFF6BCB77), active: n >= 0.05),
             const SizedBox(width: 8),
-            _ZoneDot(label: 'Good',  color: const Color(0xFFFFD93D), active: n >= 0.40),
+            _ZoneDot(label: l.zoneGood,  color: const Color(0xFFFFD93D), active: n >= 0.40),
             const SizedBox(width: 8),
-            _ZoneDot(label: 'Loud',  color: const Color(0xFFFF9F1C), active: n >= 0.65),
+            _ZoneDot(label: l.zoneLoud,  color: const Color(0xFFFF9F1C), active: n >= 0.65),
             const SizedBox(width: 8),
-            _ZoneDot(label: 'Max!',  color: const Color(0xFFFF6B6B), active: n >= 0.85),
+            _ZoneDot(label: l.zoneMax,   color: const Color(0xFFFF6B6B), active: n >= 0.85),
           ],
         ),
       ],
